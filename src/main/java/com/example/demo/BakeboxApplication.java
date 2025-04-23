@@ -5,9 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class BakeboxApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(BakeboxApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(BakeboxApplication.class, args);
+    }
 }
