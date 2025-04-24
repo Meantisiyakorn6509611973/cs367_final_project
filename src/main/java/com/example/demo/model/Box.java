@@ -9,8 +9,8 @@ public class Box {
     @GeneratedValue
     private Long id;
 
-    private String box_name;
-    private int box_price;
+    private String boxName;
+    private int boxPrice;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "box_id")
@@ -18,24 +18,22 @@ public class Box {
 
     public Box() {}
 
-    // Getter and setter for box_name
     public String getBoxName() {
-        return box_name;
+        return boxName;
     }
 
-    public void setBoxName(String box_name) {
-        this.box_name = box_name;
+    public void setBoxName(String boxName) {
+        this.boxName = boxName;
     }
 
     public int getBoxPrice() {
-        return box_price;
-    }
-    
-    public void setBoxPrice(int box_price) {
-        this.box_price = box_price;
+        return boxPrice;
     }
 
-    // Getter and setter for items
+    public void setBoxPrice(int boxPrice) {
+        this.boxPrice = boxPrice;
+    }
+
     public List<Item> getItems() {
         return items;
     }

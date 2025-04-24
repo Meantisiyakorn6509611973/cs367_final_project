@@ -1,73 +1,61 @@
-### Get all boxes
+### 1. Get all boxes
 GET http://localhost:8080/api/boxes
-Accept: application/json
 
-###
 
-### Create a new box
+### 2. Create a new box
 POST http://localhost:8080/api/boxes
 Content-Type: application/json
 
 {
-  "theme": "Sweet Snacks",
-  "price": 19.99,
+  "boxName": "Matcha Lover Box",
+  "boxPrice": 299,
   "items": [
     {
-      "name": "Brownie Bite",
-      "category": "Bakery"
+      "itemName": "Matcha Cookie",
+      "itemPrice": 60,
+      "itemAmount": 5
     },
     {
-      "name": "Strawberry Cookie",
-      "category": "Cookie"
+      "itemName": "Matcha Mochi",
+      "itemPrice": 75,
+      "itemAmount": 3
+    },
+    {
+      "itemName": "Matcha Roll Cake",
+      "itemPrice": 90,
+      "itemAmount": 4
     }
   ]
 }
 
-###
 
-### Get boxes by theme
-GET http://localhost:8080/api/boxes/theme/SweetSnacks
-Accept: application/json
+### 3. Get boxes by boxName
+GET http://localhost:8080/api/boxes/boxname/Matcha Lover Box
 
-###
 
-### Get box by ID (Example: ID = 1)
-GET http://localhost:8080/api/boxes/1
-Accept: application/json
+### 4. Randomly select 2 items (no stock reduction)
+GET http://localhost:8080/api/boxes/boxname/Matcha Lover Box/random?count=2
 
-###
 
-### Update an existing box (Example: ID = 1)
-PUT http://localhost:8080/api/boxes/1
+### 5. Purchase 1 box (1 item, reduce stock)
+POST http://localhost:8080/api/boxes/purchase/Matcha Lover Box
+
+
+### 6. Purchase 3 boxes
+POST http://localhost:8080/api/boxes/purchase/Matcha Lover Box?quantity=3
+
+
+### 7. Purchase multiple box themes
+POST http://localhost:8080/api/boxes/purchase
 Content-Type: application/json
 
-{
-  "theme": "Updated Snacks Box",
-  "price": 29.99,
-  "items": [
-    {
-      "name": "Matcha Cookie",
-      "category": "Cookie"
-    },
-    {
-      "name": "Cheesecake Square",
-      "category": "Bakery"
-    }
-  ]
-}
-
-###
-
-### Delete a box (Example: ID = 1)
-DELETE http://localhost:8080/api/boxes/1
-
-###
-
-### Add an item to existing box (if implemented via PATCH or special endpoint)
-PATCH http://localhost:8080/api/boxes/1/items
-Content-Type: application/json
-
-{
-  "name": "Chocolate Muffin",
-  "category": "Bakery"
-}
+[
+  {
+    "boxName": "Matcha Lover Box",
+    "quantity": 2
+  },
+  {
+    "boxName": "Choco Dream Box",
+    "quantity": 1
+  }
+]

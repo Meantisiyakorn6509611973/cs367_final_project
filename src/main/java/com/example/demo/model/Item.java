@@ -1,56 +1,66 @@
 package com.example.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Item {
     @Id
     @GeneratedValue
-    private Long item_id;
+    private Long itemId;
 
-    private String item_name;
-    private int item_price;
-    private int item_amount;
+    private String itemName;
+    private int itemPrice;
+    private int itemAmount;
 
-    public Item() {
+    @ManyToOne
+    @JoinColumn(name = "box_id")
+    private Box box;
+
+    public Item() {}
+
+    public Item(String itemName, int itemPrice) {
+        this.itemName = itemName;
+        this.itemPrice = itemPrice;
     }
 
-    public Item(String item_name, int item_price) {
-        this.item_name = item_name;
-        this.item_price = item_price;
-    }
-
+    // Getters and setters
     public Long getItemId() {
-        return item_id;
+        return itemId;
     }
 
-    public void setItemId(Long item_id) {
-        this.item_id = item_id;
+    public void setItemId(Long itemId) {
+        this.itemId = itemId;
     }
 
-    public String getName() {
-        return item_name;
+    public String getItemName() {
+        return itemName;
     }
 
-    public void setName(String item_name) {
-        this.item_name = item_name;
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
     }
 
     public int getItemPrice() {
-        return item_price;
+        return itemPrice;
     }
 
-    public void setItemPrice(int item_price) {
-        this.item_price = item_price;
+    public void setItemPrice(int itemPrice) {
+        this.itemPrice = itemPrice;
     }
 
-    public int getItem_amount() {
-        return item_amount;
+    public int getItemAmount() {
+        return itemAmount;
     }
 
-    public void setItem_amount(int item_amount) {
-        this.item_amount = item_amount;
+    public void setItemAmount(int itemAmount) {
+        this.itemAmount = itemAmount;
+    }
+
+    public Box getBox() {
+        return box;
+    }
+
+    public void setBox(Box box) {
+        this.box = box;
     }
 }
