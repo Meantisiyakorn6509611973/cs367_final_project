@@ -1,0 +1,73 @@
+### Get all boxes
+GET http://localhost:8080/api/boxes
+Accept: application/json
+
+###
+
+### Create a new box
+POST http://localhost:8080/api/boxes
+Content-Type: application/json
+
+{
+  "theme": "Sweet Snacks",
+  "price": 19.99,
+  "items": [
+    {
+      "name": "Brownie Bite",
+      "category": "Bakery"
+    },
+    {
+      "name": "Strawberry Cookie",
+      "category": "Cookie"
+    }
+  ]
+}
+
+###
+
+### Get boxes by theme
+GET http://localhost:8080/api/boxes/theme/SweetSnacks
+Accept: application/json
+
+###
+
+### Get box by ID (Example: ID = 1)
+GET http://localhost:8080/api/boxes/1
+Accept: application/json
+
+###
+
+### Update an existing box (Example: ID = 1)
+PUT http://localhost:8080/api/boxes/1
+Content-Type: application/json
+
+{
+  "theme": "Updated Snacks Box",
+  "price": 29.99,
+  "items": [
+    {
+      "name": "Matcha Cookie",
+      "category": "Cookie"
+    },
+    {
+      "name": "Cheesecake Square",
+      "category": "Bakery"
+    }
+  ]
+}
+
+###
+
+### Delete a box (Example: ID = 1)
+DELETE http://localhost:8080/api/boxes/1
+
+###
+
+### Add an item to existing box (if implemented via PATCH or special endpoint)
+PATCH http://localhost:8080/api/boxes/1/items
+Content-Type: application/json
+
+{
+  "name": "Chocolate Muffin",
+  "category": "Bakery"
+}

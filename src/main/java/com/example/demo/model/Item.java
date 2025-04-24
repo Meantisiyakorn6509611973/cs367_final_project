@@ -1,49 +1,56 @@
 package com.example.demo.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 
 @Entity
 public class Item {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue
+    private Long item_id;
 
-    private String name;
-    private String category;
+    private String item_name;
+    private int item_price;
+    private int item_amount;
 
-    @ManyToOne
-    @JoinColumn(name = "box_id")
-    private Box box;
-
-    public Long getId() {
-        return id;
+    public Item() {
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Item(String item_name, int item_price) {
+        this.item_name = item_name;
+        this.item_price = item_price;
+    }
+
+    public Long getItemId() {
+        return item_id;
+    }
+
+    public void setItemId(Long item_id) {
+        this.item_id = item_id;
     }
 
     public String getName() {
-        return name;
+        return item_name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setName(String item_name) {
+        this.item_name = item_name;
     }
 
-    public String getCategory() {
-        return category;
+    public int getItemPrice() {
+        return item_price;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setItemPrice(int item_price) {
+        this.item_price = item_price;
     }
 
-    public Box getBox() {
-        return box;
+    public int getItem_amount() {
+        return item_amount;
     }
 
-    public void setBox(Box box) {
-        this.box = box;
+    public void setItem_amount(int item_amount) {
+        this.item_amount = item_amount;
     }
 }

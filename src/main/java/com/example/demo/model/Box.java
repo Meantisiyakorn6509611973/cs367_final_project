@@ -6,39 +6,36 @@ import java.util.List;
 @Entity
 public class Box {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
 
-    private String theme;
-    private Double price;
+    private String box_name;
+    private int box_price;
 
-    @OneToMany(mappedBy = "box", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "box_id")
     private List<Item> items;
 
-    public Long getId() {
-        return id;
+    public Box() {}
+
+    // Getter and setter for box_name
+    public String getBoxName() {
+        return box_name;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setBoxName(String box_name) {
+        this.box_name = box_name;
     }
 
-    public String getTheme() {
-        return theme;
+    public int getBoxPrice() {
+        return box_price;
+    }
+    
+    public void setBoxPrice(int box_price) {
+        this.box_price = box_price;
     }
 
-    public void setTheme(String theme) {
-        this.theme = theme;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
+    // Getter and setter for items
     public List<Item> getItems() {
         return items;
     }
