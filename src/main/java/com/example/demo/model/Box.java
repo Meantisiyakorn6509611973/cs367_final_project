@@ -3,6 +3,8 @@ package com.example.demo.model;
 import jakarta.persistence.*;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 public class Box {
     @Id
@@ -12,8 +14,8 @@ public class Box {
     private String boxName;
     private int boxPrice;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "box_id")
+    @OneToMany(mappedBy = "box", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Item> items;
 
     public Box() {}

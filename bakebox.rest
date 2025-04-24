@@ -1,7 +1,6 @@
 ### 1. Get all boxes
 GET http://localhost:8080/api/boxes
 
-
 ### 2. Create a new custom box (Japanese Snack Box)
 POST http://localhost:8080/api/boxes
 Content-Type: application/json
@@ -52,5 +51,21 @@ POST http://localhost:8080/api/boxes/purchase/Matcha Lover Box?quantity=20
 ### 8. Attempt to purchase a non-existent box
 POST http://localhost:8080/api/boxes/purchase/Nonexistent Box
 
-### 9. Get all items
-GET GET http://localhost:8080/api/items
+### 9. Add new snacks to existing box (Matcha Lover Box)
+POST http://localhost:8080/api/boxes/6/items
+Content-Type: application/json
+
+[
+  {
+    "itemName": "Matcha Cream Puff",
+    "itemPrice": 80,
+    "itemAmount": 4
+  },
+  {
+    "itemName": "Hojicha Matcha Cookie",
+    "itemPrice": 70,
+    "itemAmount": 3
+  }
+]
+
+

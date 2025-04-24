@@ -7,9 +7,7 @@ import com.example.demo.repository.ItemRepository;
 import com.example.demo.dto.BoxPurchaseRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,60 +25,61 @@ public class BoxService {
         return boxRepository.findAll();
     }
 
+    public List<Item> getAllItems() {
+        return itemRepository.findAll();
+    }
+
     public Box saveBox(Box box) {
-        return boxRepository.save(box);
+        Box savedBox = boxRepository.save(box);
+        if (box.getItems() != null) {
+            for (Item item : box.getItems()) {
+                item.setBox(savedBox);
+            }
+            itemRepository.saveAll(box.getItems());
+        }
+        return savedBox;
     }
 
     public List<Box> getBoxesByBoxName(String boxName) {
         return boxRepository.findByBoxName(boxName);
     }
 
-    // Randomly select 1 or more items from a box and update stock
     public List<Item> getRandomItemsFromBoxName(String boxName, int numberOfItems) {
         List<Box> boxes = boxRepository.findByBoxName(boxName);
         if (boxes.isEmpty()) {
-            throw new RuntimeException("No box found with boxName: " + boxName);
+            throw new IllegalStateException("❌ No box found with name: " + boxName);
         }
 
-        Box selectedBox = boxes.get(0);
-        List<Item> items = selectedBox.getItems();
-
-        List<Item> availableItems = items.stream()
-            .filter(item -> item.getItemAmount() > 0)
-            .collect(Collectors.toList());
+        Box box = boxes.get(0);
+        List<Item> availableItems = box.getItems().stream()
+                .filter(item -> item.getItemAmount() > 0)
+                .collect(Collectors.toList());
 
         if (availableItems.size() < numberOfItems) {
-            throw new RuntimeException("Not enough stock for box: " + boxName);
+            throw new IllegalStateException("❌ Not enough items in stock for box: " + boxName);
         }
 
         Collections.shuffle(availableItems);
         List<Item> selectedItems = availableItems.stream()
-            .limit(numberOfItems)
-            .collect(Collectors.toList());
+                .limit(numberOfItems)
+                .collect(Collectors.toList());
 
-        selectedItems.forEach(item -> {
+        for (Item item : selectedItems) {
             item.setItemAmount(item.getItemAmount() - 1);
             itemRepository.save(item);
-        });
+        }
 
         return selectedItems;
     }
 
-    // Purchase multiple boxes of one boxName (each box = 1 item)
     public List<Item> purchaseBoxesByBoxName(String boxName, int quantity) {
         List<Item> result = new ArrayList<>();
         for (int i = 0; i < quantity; i++) {
-            List<Item> randomOne = getRandomItemsFromBoxName(boxName, 1);
-            if (!randomOne.isEmpty()) {
-                result.addAll(randomOne);
-            } else {
-                throw new RuntimeException("Insufficient stock for box: " + boxName);
-            }
+            result.addAll(getRandomItemsFromBoxName(boxName, 1));
         }
         return result;
     }
 
-    // Purchase boxes from multiple themes
     public List<Item> purchaseMultipleBoxes(List<BoxPurchaseRequest> boxRequests) {
         List<Item> allItems = new ArrayList<>();
         for (BoxPurchaseRequest request : boxRequests) {
@@ -88,4 +87,36 @@ public class BoxService {
         }
         return allItems;
     }
+
+    public List<Item> addItemsToExistingBox(Long boxId, List<Item> items) {
+        Optional<Box> boxOptional = boxRepository.findById(boxId);
+        if (boxOptional.isEmpty()) {
+            throw new IllegalArgumentException("Box with ID " + boxId + " not found.");
+        }
+
+        Box box = boxOptional.get();
+        for (Item item : items) {
+            item.setBox(box);
+        }
+
+        return itemRepository.saveAll(items);
+    }
+    public Box addItemsToExistingBoxAndReturnFullBox(Long boxId, List<Item> items) {
+        Optional<Box> boxOptional = boxRepository.findById(boxId);
+        if (boxOptional.isEmpty()) {
+            throw new IllegalArgumentException("Box with ID " + boxId + " not found.");
+        }
+    
+        Box box = boxOptional.get();
+    
+        for (Item item : items) {
+            item.setBox(box);
+        }
+    
+        itemRepository.saveAll(items);
+    
+        // Refresh and return full box info (with updated item list)
+        return boxRepository.findById(boxId).orElseThrow();
+    }
+    
 }
