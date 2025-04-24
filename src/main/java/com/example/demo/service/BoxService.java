@@ -5,6 +5,8 @@ import com.example.demo.model.Item;
 import com.example.demo.repository.BoxRepository;
 import com.example.demo.repository.ItemRepository;
 import com.example.demo.dto.BoxPurchaseRequest;
+import com.example.demo.dto.ItemQuantityUpdateRequest;
+
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -102,4 +104,78 @@ public class BoxService {
         itemRepository.saveAll(items);
         return boxRepository.findById(boxId).orElseThrow();
     }
+
+    public void deleteBoxById(Long id) {
+        if (!boxRepository.existsById(id)) {
+            throw new IllegalArgumentException("Box with ID " + id + " does not exist.");
+        }
+        boxRepository.deleteById(id);
+    }
+
+    public Box getBoxById(Long id) {
+        return boxRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Box with ID " + id + " not found."));
+    }
+
+    public Map<String, Object> deleteItemsAndReturnInfo(List<Long> itemIds) {
+        List<Item> deletedItems = itemRepository.findAllById(itemIds);
+        itemRepository.deleteAllById(itemIds);
+        List<Item> remainingItems = itemRepository.findAll();
+
+        return Map.of(
+                "message", "Items deleted successfully.",
+                "deletedItems", deletedItems,
+                "remainingItems", remainingItems
+        );
+    }
+
+    public Map<String, Object> handleItemAction(ItemQuantityUpdateRequest req) {
+        Long itemId = req.getItemId();
+        String action = req.getAction();
+    
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("Item with ID " + itemId + " not found."));
+    
+        Map<String, Object> boxInfo = Map.of(
+                "boxId", item.getBox().getId(),
+                "boxName", item.getBox().getBoxName(),
+                "boxPrice", item.getBox().getBoxPrice()
+        );
+    
+        if ("delete".equalsIgnoreCase(action)) {
+            itemRepository.deleteById(itemId);
+            return Map.of(
+                    "action", "deleted",
+                    "itemId", itemId,
+                    "itemName", item.getItemName(),
+                    "box", boxInfo
+            );
+        }
+    
+        if ("update".equalsIgnoreCase(action)) {
+            int delta = req.getDeltaAmount();
+            int before = item.getItemAmount();
+            int after = before + delta;
+    
+            if (after < 0) {
+                throw new IllegalArgumentException("Item quantity can't go below zero.");
+            }
+    
+            item.setItemAmount(after);
+            itemRepository.save(item);
+    
+            return Map.of(
+                    "action", "updated",
+                    "itemId", item.getItemId(),
+                    "itemName", item.getItemName(),
+                    "beforeAmount", before,
+                    "delta", delta,
+                    "afterAmount", after,
+                    "box", boxInfo
+            );
+        }
+    
+        throw new IllegalArgumentException("Invalid action: " + action);
+    }
+    
 }

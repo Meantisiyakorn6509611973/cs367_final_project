@@ -41,7 +41,18 @@ POST http://localhost:8080/api/boxes/purchase/Matcha Lover Box?quantity=20
 ### 8. Attempt to purchase a non-existent box
 POST http://localhost:8080/api/boxes/purchase/Nonexistent Box
 
-### 9. Add new snacks to existing box (Matcha Lover Box)
-POST http://localhost:8080/api/boxes/6/items
+### 9. Update or delete items with action-based control
+PUT http://localhost:8080/api/items/quantity
 Content-Type: application/json
+
+[
+  { "itemId": 3, "action": "delete" },
+  { "itemId": 4, "action": "update", "deltaAmount": -2 },
+  { "itemId": 5, "action": "update", "deltaAmount": 1000 }
+]
+
+### 10. Delete a box by ID and return deleted box info and remaining boxes
+DELETE http://localhost:8080/api/boxes/1
+Accept: application/json
+
 
