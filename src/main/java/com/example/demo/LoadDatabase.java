@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 public class LoadDatabase {
@@ -20,39 +21,68 @@ public class LoadDatabase {
     @Bean
     CommandLineRunner initDatabase(BoxRepository boxRepository, ItemRepository itemRepository) {
         return args -> {
-            // Create the box
-            Box matchaBox = new Box();
-            matchaBox.setBoxName("Matcha Lover Box");
-            matchaBox.setBoxPrice(299);
+            createBoxWithItems(boxRepository, itemRepository, "International Snack Box", 59, List.of(
+                    new Item("KitKat Japan Green Tea", 75, 6),
+                    new Item("Pepero Almond", 60, 5),
+                    new Item("Milka Alpine Milk Chocolate", 85, 4),
+                    new Item("Hi-Chew Mix Fruit", 50, 7),
+                    new Item("Glico Collon Matcha", 65, 3)
+            ));
 
-            // Save the box first so it gets an ID
-            matchaBox = boxRepository.save(matchaBox);
+            createBoxWithItems(boxRepository, itemRepository, "Bakery Delight Box", 59, List.of(
+                    new Item("Butter Croissant", 55, 4),
+                    new Item("Red Velvet Cupcake", 60, 5),
+                    new Item("Mini Macaron Box", 90, 3),
+                    new Item("Chocolate Fudge Brownie", 65, 6),
+                    new Item("Fresh Milk Cream Bun", 50, 5)
+            ));
 
-            // Create items and associate them with the box
-            Item item1 = new Item("Matcha Macarons", 90);
-            item1.setItemAmount(5);
-            item1.setBox(matchaBox); // ✅ assign box
+            createBoxWithItems(boxRepository, itemRepository, "Healthy Snack Box", 59, List.of(
+                    new Item("Granola Honey Crunch Bar", 45, 6),
+                    new Item("Roasted Almond Mix", 55, 4),
+                    new Item("Dried Mango Slices", 50, 5),
+                    new Item("Chia Seed Oat Cookie", 40, 6),
+                    new Item("Low Sugar Multigrain Biscuit", 45, 4)
+            ));
 
-            Item item2 = new Item("Matcha Brownie", 60);
-            item2.setItemAmount(4);
-            item2.setBox(matchaBox);
+            createBoxWithItems(boxRepository, itemRepository, "Traditional Thai Snack Box", 59, List.of(
+                    new Item("ขนมเปี๊ยะไส้ถั่วไข่เค็ม", 60, 5),
+                    new Item("ขนมหม้อแกงเผือก", 55, 4),
+                    new Item("คุกกี้ข้าวแต๋นกรอบ", 50, 6),
+                    new Item("ขนมฝอยทองม้วน", 45, 5),
+                    new Item("ขนมเปี๊ยะไส้คัสตาร์ดไข่เค็ม", 65, 3)
+            ));
 
-            Item item3 = new Item("White Chocolate Matcha Cookies", 55);
-            item3.setItemAmount(3);
-            item3.setBox(matchaBox);
+            createBoxWithItems(boxRepository, itemRepository, "Chocolate Lover Box", 79, List.of(
+                    new Item("Dark Chocolate with Sea Salt", 85, 4),
+                    new Item("Belgian Chocolate Truffles", 95, 3),
+                    new Item("Milk Chocolate with Hazelnuts", 75, 5),
+                    new Item("Yuzu Citrus Chocolate", 90, 2),
+                    new Item("Chocolate Raisin Bar", 60, 6)
+            ));
 
-            Item item4 = new Item("Red Bean Matcha Roll Cake", 75);
-            item4.setItemAmount(2);
-            item4.setBox(matchaBox);
+            createBoxWithItems(boxRepository, itemRepository, "Matcha Lover Box", 79, Arrays.asList(
+                    new Item("Matcha Macarons", 90, 5),
+                    new Item("Matcha Brownie", 60, 4),
+                    new Item("White Chocolate Matcha Cookies", 55, 3),
+                    new Item("Red Bean Matcha Roll Cake", 75, 2),
+                    new Item("Matcha Warabi Mochi", 65, 6)
+            ));
 
-            Item item5 = new Item("Matcha Warabi Mochi", 65);
-            item5.setItemAmount(6);
-            item5.setBox(matchaBox);
-
-            // Save all items
-            itemRepository.saveAll(Arrays.asList(item1, item2, item3, item4, item5));
-
-            log.info("Box and items initialized successfully");
+            log.info("All themed boxes initialized.");
         };
+    }
+
+    private void createBoxWithItems(BoxRepository boxRepo, ItemRepository itemRepo, String boxName, int boxPrice, List<Item> items) {
+        Box box = new Box();
+        box.setBoxName(boxName);
+        box.setBoxPrice(boxPrice);
+        box = boxRepo.save(box);
+
+        for (Item item : items) {
+            item.setBox(box);
+        }
+
+        itemRepo.saveAll(items);
     }
 }

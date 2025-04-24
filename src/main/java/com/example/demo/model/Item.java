@@ -18,9 +18,10 @@ public class Item {
 
     public Item() {}
 
-    public Item(String itemName, int itemPrice) {
+    public Item(String itemName, int itemPrice, int itemAmount) {
         this.itemName = itemName;
         this.itemPrice = itemPrice;
+        this.itemAmount = itemAmount;
     }
 
     // Getters and setters

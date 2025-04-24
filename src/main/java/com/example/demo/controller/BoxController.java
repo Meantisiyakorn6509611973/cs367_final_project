@@ -4,9 +4,11 @@ import com.example.demo.model.Box;
 import com.example.demo.model.Item;
 import com.example.demo.service.BoxService;
 import com.example.demo.dto.BoxPurchaseRequest;
+import com.example.demo.dto.PurchaseResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/boxes")
@@ -28,27 +30,28 @@ public class BoxController {
         return boxService.saveBox(box);
     }
 
-    @GetMapping("/boxname/{boxname}")
-    public List<Box> getBoxesByBoxName(@PathVariable String boxname) {
-        return boxService.getBoxesByBoxName(boxname);
+    @GetMapping("/boxname/{boxName}")
+    public List<Box> getBoxesByBoxName(@PathVariable String boxName) {
+        return boxService.getBoxesByBoxName(boxName);
     }
 
-    @GetMapping("/boxname/{boxname}/random")
-    public List<Item> getRandomItems(
-            @PathVariable String boxname,
-            @RequestParam(defaultValue = "1") int count) {
-        return boxService.getRandomItemsFromBoxName(boxname, count);
-    }
-
-    @PostMapping("/purchase/{boxname}")
-    public List<Item> purchaseBoxes(
-            @PathVariable String boxname,
+    @PostMapping("/purchase/{boxName}")
+    public PurchaseResponse purchaseBoxes(
+            @PathVariable String boxName,
             @RequestParam(defaultValue = "1") int quantity) {
-        return boxService.purchaseBoxesByBoxName(boxname, quantity);
+        List<Item> purchasedItems = boxService.purchaseBoxesByBoxName(boxName, quantity);
+        List<String> itemNames = purchasedItems.stream()
+                .map(Item::getItemName)
+                .collect(Collectors.toList());
+        return new PurchaseResponse(itemNames);
     }
 
     @PostMapping("/purchase")
-    public List<Item> purchaseMultipleThemes(@RequestBody List<BoxPurchaseRequest> boxRequests) {
-        return boxService.purchaseMultipleBoxes(boxRequests);
+    public PurchaseResponse purchaseMultipleThemes(@RequestBody List<BoxPurchaseRequest> boxRequests) {
+        List<Item> allItems = boxService.purchaseMultipleBoxes(boxRequests);
+        List<String> itemNames = allItems.stream()
+                .map(Item::getItemName)
+                .collect(Collectors.toList());
+        return new PurchaseResponse(itemNames);
     }
 }

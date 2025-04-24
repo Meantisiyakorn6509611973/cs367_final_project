@@ -2,50 +2,36 @@
 GET http://localhost:8080/api/boxes
 
 
-### 2. Create a new box
+### 2. Create a new custom box (Japanese Snack Box)
 POST http://localhost:8080/api/boxes
 Content-Type: application/json
 
 {
-  "boxName": "Matcha Lover Box",
-  "boxPrice": 299,
+  "boxName": "Japanese Snack Box",
+  "boxPrice": 59,
   "items": [
-    {
-      "itemName": "Matcha Cookie",
-      "itemPrice": 60,
-      "itemAmount": 5
-    },
-    {
-      "itemName": "Matcha Mochi",
-      "itemPrice": 75,
-      "itemAmount": 3
-    },
-    {
-      "itemName": "Matcha Roll Cake",
-      "itemPrice": 90,
-      "itemAmount": 4
-    }
+    { "itemName": "Tokyo Banana", "itemPrice": 85, "itemAmount": 4 },
+    { "itemName": "Matcha Pocky", "itemPrice": 45, "itemAmount": 6 },
+    { "itemName": "Yuzu Citrus Candy", "itemPrice": 50, "itemAmount": 5 },
+    { "itemName": "Shiroi Koibito Cookies", "itemPrice": 90, "itemAmount": 3 },
+    { "itemName": "Ume Plum Rice Crackers", "itemPrice": 65, "itemAmount": 4 }
   ]
 }
 
 
-### 3. Get boxes by boxName
+### 3. View all items in a specific box
 GET http://localhost:8080/api/boxes/boxname/Matcha Lover Box
 
 
-### 4. Randomly select 2 items (no stock reduction)
-GET http://localhost:8080/api/boxes/boxname/Matcha Lover Box/random?count=2
-
-
-### 5. Purchase 1 box (1 item, reduce stock)
+### 4. Purchase 1 box (receive 1 random item with confirmation)
 POST http://localhost:8080/api/boxes/purchase/Matcha Lover Box
 
 
-### 6. Purchase 3 boxes
+### 5. Purchase 3 boxes (receive 3 random items with message)
 POST http://localhost:8080/api/boxes/purchase/Matcha Lover Box?quantity=3
 
 
-### 7. Purchase multiple box themes
+### 6. Purchase multiple themes
 POST http://localhost:8080/api/boxes/purchase
 Content-Type: application/json
 
@@ -55,7 +41,16 @@ Content-Type: application/json
     "quantity": 2
   },
   {
-    "boxName": "Choco Dream Box",
+    "boxName": "Chocolate Lover Box",
     "quantity": 1
   }
 ]
+
+### 7. Attempt to purchase more boxes than available items (edge case)
+POST http://localhost:8080/api/boxes/purchase/Matcha Lover Box?quantity=20
+
+### 8. Attempt to purchase a non-existent box
+POST http://localhost:8080/api/boxes/purchase/Nonexistent Box
+
+### 9. Get all items
+GET GET http://localhost:8080/api/items
