@@ -46,12 +46,12 @@ public class LoadDatabase {
             ));
 
             createBoxWithItems(boxRepository, itemRepository, "Traditional Thai Snack Box", 59, List.of(
-                    new Item("ขนมเปี๊ยะไส้ถั่วไข่เค็ม", 60, 5),
-                    new Item("ขนมหม้อแกงเผือก", 55, 4),
-                    new Item("คุกกี้ข้าวแต๋นกรอบ", 50, 6),
-                    new Item("ขนมฝอยทองม้วน", 45, 5),
-                    new Item("ขนมเปี๊ยะไส้คัสตาร์ดไข่เค็ม", 65, 3)
-            ));
+                    new Item("Salted Egg Mung Bean Pastry", 60, 5),
+                    new Item("Taro Custard Dessert", 55, 4),
+                    new Item("Crispy Rice Cracker Cookies", 50, 6),
+                    new Item("Golden Egg Thread Rolls", 45, 5),
+                    new Item("Salted Egg Custard Pastry", 65, 3)
+            ));            
 
             createBoxWithItems(boxRepository, itemRepository, "Chocolate Lover Box", 79, List.of(
                     new Item("Dark Chocolate with Sea Salt", 85, 4),

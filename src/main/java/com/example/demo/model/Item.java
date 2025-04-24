@@ -1,13 +1,13 @@
 package com.example.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.*;
 
 @Entity
 public class Item {
+
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long itemId;
 
     private String itemName;
@@ -27,7 +27,6 @@ public class Item {
         this.itemAmount = itemAmount;
     }
 
-    // Getters and setters
     public Long getItemId() {
         return itemId;
     }

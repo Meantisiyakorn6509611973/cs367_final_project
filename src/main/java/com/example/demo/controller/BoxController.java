@@ -74,7 +74,7 @@ public class BoxController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
         }
-    }    
+    }
 
     @GetMapping("/items")
     public List<Item> getAllItems() {

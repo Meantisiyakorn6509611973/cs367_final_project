@@ -43,4 +43,13 @@ public class Box {
     public void setItems(List<Item> items) {
         this.items = items;
     }
+
+    public Long getId() {
+        return id;
+    }
+    
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
 }

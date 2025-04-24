@@ -47,7 +47,7 @@ public class BoxService {
     public List<Item> getRandomItemsFromBoxName(String boxName, int numberOfItems) {
         List<Box> boxes = boxRepository.findByBoxName(boxName);
         if (boxes.isEmpty()) {
-            throw new IllegalStateException("❌ No box found with name: " + boxName);
+            throw new IllegalStateException("Error: No box found with name: " + boxName);
         }
 
         Box box = boxes.get(0);
@@ -56,7 +56,7 @@ public class BoxService {
                 .collect(Collectors.toList());
 
         if (availableItems.size() < numberOfItems) {
-            throw new IllegalStateException("❌ Not enough items in stock for box: " + boxName);
+            throw new IllegalStateException("Error: Not enough items in stock for box: " + boxName);
         }
 
         Collections.shuffle(availableItems);
@@ -88,35 +88,18 @@ public class BoxService {
         return allItems;
     }
 
-    public List<Item> addItemsToExistingBox(Long boxId, List<Item> items) {
-        Optional<Box> boxOptional = boxRepository.findById(boxId);
-        if (boxOptional.isEmpty()) {
-            throw new IllegalArgumentException("Box with ID " + boxId + " not found.");
-        }
-
-        Box box = boxOptional.get();
-        for (Item item : items) {
-            item.setBox(box);
-        }
-
-        return itemRepository.saveAll(items);
-    }
     public Box addItemsToExistingBoxAndReturnFullBox(Long boxId, List<Item> items) {
         Optional<Box> boxOptional = boxRepository.findById(boxId);
         if (boxOptional.isEmpty()) {
             throw new IllegalArgumentException("Box with ID " + boxId + " not found.");
         }
-    
+
         Box box = boxOptional.get();
-    
         for (Item item : items) {
             item.setBox(box);
         }
-    
+
         itemRepository.saveAll(items);
-    
-        // Refresh and return full box info (with updated item list)
         return boxRepository.findById(boxId).orElseThrow();
     }
-    
 }
