@@ -54,5 +54,3 @@ Content-Type: application/json
 ### 10. Delete a box by ID and return deleted box info and remaining boxes
 DELETE http://localhost:8080/api/boxes/1
 Accept: application/json
-
-
