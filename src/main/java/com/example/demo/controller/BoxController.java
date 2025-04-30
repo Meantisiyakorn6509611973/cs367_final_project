@@ -23,6 +23,12 @@ public class BoxController {
         this.boxService = boxService;
     }
 
+    @GetMapping("/ping")
+    public String pingTest() {
+        return "✅ Server is up and reachable!";
+    }
+    
+
     @GetMapping("/boxes")
     public List<Box> getAllBoxes() {
         return boxService.getAllBoxes();
@@ -34,8 +40,13 @@ public class BoxController {
     }
 
     @PostMapping("/boxes")
-    public Box createBox(@RequestBody Box box) {
-        return boxService.saveBox(box);
+    public ResponseEntity<?> createBox(@RequestBody Box box) {
+        try {
+            Box savedBox = boxService.saveBox(box);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedBox);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/boxes/purchase/{boxName}")

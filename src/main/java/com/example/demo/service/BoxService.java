@@ -32,6 +32,11 @@ public class BoxService {
     }
 
     public Box saveBox(Box box) {
+        List<Box> existingBoxes = boxRepository.findByBoxName(box.getBoxName());
+        if (!existingBoxes.isEmpty()) {
+            throw new IllegalStateException("Box name '" + box.getBoxName() + "' already exists.");
+        }
+    
         Box savedBox = boxRepository.save(box);
         if (box.getItems() != null) {
             for (Item item : box.getItems()) {
@@ -51,36 +56,73 @@ public class BoxService {
         if (boxes.isEmpty()) {
             throw new IllegalStateException("Error: No box found with name: " + boxName);
         }
-
+    
         Box box = boxes.get(0);
         List<Item> availableItems = box.getItems().stream()
                 .filter(item -> item.getItemAmount() > 0)
                 .collect(Collectors.toList());
-
+    
         if (availableItems.size() < numberOfItems) {
-            throw new IllegalStateException("Error: Not enough items in stock for box: " + boxName);
+            throw new IllegalStateException("Error: Not enough item types in stock for box: " + boxName);
         }
-
-        Collections.shuffle(availableItems);
-        List<Item> selectedItems = availableItems.stream()
-                .limit(numberOfItems)
-                .collect(Collectors.toList());
-
+    
+        // Shuffle and choose candidates
+        List<Item> shuffled = new ArrayList<>(availableItems);
+        Collections.shuffle(shuffled);
+        List<Item> selectedItems = shuffled.subList(0, numberOfItems);
+    
+        // Verify all selected items have enough quantity
+        for (Item item : selectedItems) {
+            if (item.getItemAmount() <= 0) {
+                throw new IllegalStateException("Error: Item " + item.getItemName() + " is out of stock.");
+            }
+        }
+    
+        // All good — now deduct amounts
         for (Item item : selectedItems) {
             item.setItemAmount(item.getItemAmount() - 1);
-            itemRepository.save(item);
         }
-
+    
+        itemRepository.saveAll(selectedItems);
         return selectedItems;
-    }
+    }    
 
     public List<Item> purchaseBoxesByBoxName(String boxName, int quantity) {
-        List<Item> result = new ArrayList<>();
-        for (int i = 0; i < quantity; i++) {
-            result.addAll(getRandomItemsFromBoxName(boxName, 1));
+        List<Box> boxes = boxRepository.findByBoxName(boxName);
+        if (boxes.isEmpty()) {
+            throw new IllegalStateException("Error: No box found with name: " + boxName);
         }
-        return result;
-    }
+    
+        Box box = boxes.get(0);
+        List<Item> availableItems = box.getItems().stream()
+                .filter(item -> item.getItemAmount() > 0)
+                .collect(Collectors.toList());
+    
+        if (availableItems.size() < quantity) {
+            throw new IllegalStateException("Error: Not enough different item types available for requested boxes.");
+        }
+    
+        // Check if each item can support reduction without modifying anything yet
+        List<Item> selectedItems = new ArrayList<>();
+        List<Item> tempList = new ArrayList<>(availableItems);
+        Collections.shuffle(tempList);
+    
+        for (int i = 0; i < quantity; i++) {
+            Item item = tempList.get(i);
+            if (item.getItemAmount() < 1) {
+                throw new IllegalStateException("Error: Item " + item.getItemName() + " has insufficient stock.");
+            }
+            selectedItems.add(item);
+        }
+    
+        // All checks passed, now deduct quantities and save
+        for (Item item : selectedItems) {
+            item.setItemAmount(item.getItemAmount() - 1);
+        }
+        itemRepository.saveAll(selectedItems);
+    
+        return selectedItems;
+    }    
 
     public List<Item> purchaseMultipleBoxes(List<BoxPurchaseRequest> boxRequests) {
         List<Item> allItems = new ArrayList<>();
