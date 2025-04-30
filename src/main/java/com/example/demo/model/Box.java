@@ -1,3 +1,5 @@
+// Entity class representing a snack box that contains multiple items.
+
 package com.example.demo.model;
 
 import jakarta.persistence.*;
@@ -9,17 +11,24 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 public class Box {
     @Id
     @GeneratedValue
+    // Unique identifier for the box (auto-generated)
     private Long id;
 
+     // Name of the box (e.g., "Matcha Lover Box")
     private String boxName;
+
+     // Price of the box
     private int boxPrice;
 
     @OneToMany(mappedBy = "box", cascade = CascadeType.ALL)
     @JsonManagedReference
+    // List of items associated with this box
     private List<Item> items;
 
+    // Default constructor
     public Box() {}
 
+    // Getter and setter for boxName
     public String getBoxName() {
         return boxName;
     }
@@ -28,6 +37,7 @@ public class Box {
         this.boxName = boxName;
     }
 
+    // Getter and setter for boxPrice
     public int getBoxPrice() {
         return boxPrice;
     }
@@ -36,6 +46,7 @@ public class Box {
         this.boxPrice = boxPrice;
     }
 
+    // Getter and setter for items
     public List<Item> getItems() {
         return items;
     }
@@ -44,6 +55,7 @@ public class Box {
         this.items = items;
     }
 
+    // Getter and setter for id
     public Long getId() {
         return id;
     }

@@ -1,3 +1,4 @@
+// Service layer for handling box operations including creation, purchase, and item stock management.
 package com.example.demo.service;
 
 import com.example.demo.model.Box;
@@ -23,14 +24,17 @@ public class BoxService {
         this.itemRepository = itemRepository;
     }
 
+    // Fetch all boxes
     public List<Box> getAllBoxes() {
         return boxRepository.findAll();
     }
 
+    // Fetch all items
     public List<Item> getAllItems() {
         return itemRepository.findAll();
     }
 
+    // Save a new box if the name is unique, along with its items
     public Box saveBox(Box box) {
         List<Box> existingBoxes = boxRepository.findByBoxName(box.getBoxName());
         if (!existingBoxes.isEmpty()) {
@@ -47,10 +51,12 @@ public class BoxService {
         return savedBox;
     }
 
+     // Find boxes by name
     public List<Box> getBoxesByBoxName(String boxName) {
         return boxRepository.findByBoxName(boxName);
     }
 
+     // Select random items from a box and reduce their quantities (used in purchasing logic)
     public List<Item> getRandomItemsFromBoxName(String boxName, int numberOfItems) {
         List<Box> boxes = boxRepository.findByBoxName(boxName);
         if (boxes.isEmpty()) {
@@ -87,6 +93,7 @@ public class BoxService {
         return selectedItems;
     }    
 
+    // Purchase boxes by name, ensuring availability and updating stock
     public List<Item> purchaseBoxesByBoxName(String boxName, int quantity) {
         List<Box> boxes = boxRepository.findByBoxName(boxName);
         if (boxes.isEmpty()) {
@@ -124,6 +131,7 @@ public class BoxService {
         return selectedItems;
     }    
 
+    // Purchase multiple boxes by request list
     public List<Item> purchaseMultipleBoxes(List<BoxPurchaseRequest> boxRequests) {
         List<Item> allItems = new ArrayList<>();
         for (BoxPurchaseRequest request : boxRequests) {
@@ -132,6 +140,7 @@ public class BoxService {
         return allItems;
     }
 
+     // Add items to an existing box
     public Box addItemsToExistingBoxAndReturnFullBox(Long boxId, List<Item> items) {
         Optional<Box> boxOptional = boxRepository.findById(boxId);
         if (boxOptional.isEmpty()) {
@@ -147,6 +156,7 @@ public class BoxService {
         return boxRepository.findById(boxId).orElseThrow();
     }
 
+     // Delete a box by ID
     public void deleteBoxById(Long id) {
         if (!boxRepository.existsById(id)) {
             throw new IllegalArgumentException("Box with ID " + id + " does not exist.");
@@ -154,11 +164,13 @@ public class BoxService {
         boxRepository.deleteById(id);
     }
 
+    // Retrieve a box by ID
     public Box getBoxById(Long id) {
         return boxRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Box with ID " + id + " not found."));
     }
 
+    // Delete multiple items and return a summary
     public Map<String, Object> deleteItemsAndReturnInfo(List<Long> itemIds) {
         List<Item> deletedItems = itemRepository.findAllById(itemIds);
         itemRepository.deleteAllById(itemIds);
@@ -171,6 +183,7 @@ public class BoxService {
         );
     }
 
+     // Handle item actions: update stock or delet
     public Map<String, Object> handleItemAction(ItemQuantityUpdateRequest req) {
         Long itemId = req.getItemId();
         String action = req.getAction();
