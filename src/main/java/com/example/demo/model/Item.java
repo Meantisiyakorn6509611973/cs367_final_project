@@ -1,3 +1,5 @@
+// Entity class representing an individual snack item that belongs to a box.
+
 package com.example.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -8,25 +10,35 @@ public class Item {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // Unique identifier for the item
     private Long itemId;
 
+    // Name of the snack item (e.g., "Matcha Roll Cake")
     private String itemName;
+
+    // Price of the individual item
     private int itemPrice;
+
+    // Current stock amount of the item
     private int itemAmount;
 
     @ManyToOne
     @JoinColumn(name = "box_id")
     @JsonBackReference
+    // Reference to the box that this item belongs to
     private Box box;
 
+    // Default constructor
     public Item() {}
 
+    // Constructor with parameters
     public Item(String itemName, int itemPrice, int itemAmount) {
         this.itemName = itemName;
         this.itemPrice = itemPrice;
         this.itemAmount = itemAmount;
     }
 
+    // Getters and setters
     public Long getItemId() {
         return itemId;
     }

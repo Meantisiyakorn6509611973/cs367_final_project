@@ -1,3 +1,5 @@
+// This class defines REST endpoints for interacting with snack boxes and their items.
+
 package com.example.demo.controller;
 
 import com.example.demo.model.Box;
@@ -15,31 +17,37 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
+// Base path for all endpoints in this controller
 public class BoxController {
 
     private final BoxService boxService;
 
+    // Constructor to inject BoxService dependency
     public BoxController(BoxService boxService) {
         this.boxService = boxService;
     }
 
     @GetMapping("/ping")
+    // Simple GET endpoint for server health check
     public String pingTest() {
         return "✅ Server is up and reachable!";
     }
     
 
     @GetMapping("/boxes")
+    // Returns a list of all available boxes
     public List<Box> getAllBoxes() {
         return boxService.getAllBoxes();
     }
 
     @GetMapping("/boxes/boxname/{boxName}")
+    // Returns boxes that match a specific name
     public List<Box> getBoxByBoxName(@PathVariable String boxName) {
         return boxService.getBoxesByBoxName(boxName);
     }
 
     @PostMapping("/boxes")
+    // Creates a new box if its name is unique
     public ResponseEntity<?> createBox(@RequestBody Box box) {
         try {
             Box savedBox = boxService.saveBox(box);
@@ -50,6 +58,7 @@ public class BoxController {
     }
 
     @PostMapping("/boxes/purchase/{boxName}")
+    // Purchases a specific number of boxes by name; verifies stock before purchase
     public ResponseEntity<?> purchaseBoxes(
             @PathVariable String boxName,
             @RequestParam(defaultValue = "1") int quantity) {
@@ -65,6 +74,7 @@ public class BoxController {
     }
 
     @PostMapping("/boxes/purchase")
+    // Purchases multiple boxes based on a list of box requests
     public ResponseEntity<?> purchaseMultipleBoxes(@RequestBody List<BoxPurchaseRequest> boxRequests) {
         try {
             List<Item> items = boxService.purchaseMultipleBoxes(boxRequests);
@@ -78,6 +88,7 @@ public class BoxController {
     }
 
     @DeleteMapping("/boxes/{id}")
+     // Deletes a box by ID and returns remaining boxes
     public ResponseEntity<?> deleteBox(@PathVariable Long id) {
         try {
             Box deletedBox = boxService.getBoxById(id);
@@ -95,6 +106,7 @@ public class BoxController {
     }
 
     @PutMapping("/items/quantity")
+     // Updates or deletes item quantities based on request actions (e.g., increase, decrease, or remove)
     public ResponseEntity<?> updateItemQuantities(@RequestBody List<ItemQuantityUpdateRequest> requests) {
         try {
             List<Map<String, Object>> results = new ArrayList<>();
@@ -113,6 +125,7 @@ public class BoxController {
     }    
     
     @GetMapping("/items")
+     // Returns all items across all boxes
     public List<Item> getAllItems() {
         return boxService.getAllItems();
     }
