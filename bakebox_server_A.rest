@@ -1,14 +1,14 @@
 ### [TC01] Get all available boxes
-GET http://localhost:8080/api/boxes
+GET http://172.20.10.2:8080/api/boxes
 
 ### [TC02] Get box by exact name (Matcha Lover Box)
-GET http://localhost:8080/api/boxes/boxname/Matcha Lover Box
+GET http://172.20.10.2:8080/api/boxes/boxname/Matcha Lover Box
 
 ### [TC03] Get all items from all boxes
-GET http://localhost:8080/api/items
+GET http://172.20.10.2:8080/api/items
 
 ### [TC04] Create a new box with full item list (valid)
-POST http://localhost:8080/api/boxes
+POST http://172.20.10.2:8080/api/boxes
 Content-Type: application/json
 
 {
@@ -24,7 +24,7 @@ Content-Type: application/json
 }
 
 ### [TC05] Create a box with empty item list
-POST http://localhost:8080/api/boxes
+POST http://172.20.10.2:8080/api/boxes
 Content-Type: application/json
 
 {
@@ -34,7 +34,7 @@ Content-Type: application/json
 }
 
 ### [TC06] Create a box with missing fields (invalid payload)
-POST http://localhost:8080/api/boxes
+POST http://172.20.10.2:8080/api/boxes
 Content-Type: application/json
 
 {
@@ -42,7 +42,7 @@ Content-Type: application/json
 }
 
 ### [TC15] Update and delete items with valid actions
-PUT http://localhost:8080/api/items/quantity
+PUT http://172.20.10.2:8080/api/items/quantity
 Content-Type: application/json
 
 [
@@ -52,7 +52,7 @@ Content-Type: application/json
 ]
 
 ### [TC16] Update item with invalid action keyword
-PUT http://localhost:8080/api/items/quantity
+PUT http://172.20.10.2:8080/api/items/quantity
 Content-Type: application/json
 
 [
@@ -60,7 +60,7 @@ Content-Type: application/json
 ]
 
 ### [TC17] Update non-existent itemId
-PUT http://localhost:8080/api/items/quantity
+PUT http://172.20.10.2:8080/api/items/quantity
 Content-Type: application/json
 
 [
@@ -68,11 +68,11 @@ Content-Type: application/json
 ]
 
 ### [TC18] Delete box by valid ID (expect deleted + remaining boxes)
-DELETE http://localhost:8080/api/boxes/1
+DELETE http://172.20.10.2:8080/api/boxes/1
 Accept: application/json
 
 ### [TC19] Delete non-existent box by ID
-DELETE http://localhost:8080/api/boxes/9999
+DELETE http://172.20.10.2:8080/api/boxes/9999
 
 ### [TC20] Delete with invalid ID type (string instead of number)
-DELETE http://localhost:8080/api/boxes/abc
+DELETE http://172.20.10.2:8080/api/boxes/abc
