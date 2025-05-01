@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bakery Box Multi-Purchase</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff4e6;
+      color: #5e3c2c;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    body.dark {
+      background-color: #1a1a1a;
+      color: #ffe8c2;
+    }
+
+    h1 {
+      color: #d88b4c;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      text-shadow: 1px 1px #fff0da;
+    }
+
+    .music-toggle {
+      position: fixed;
+      top: 10px;
+      right: 20px;
+      background: #fff6dd;
+      border: 2px solid #ffc58f;
+      padding: 8px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #a45b37;
+    }
+
+    .dark .music-toggle {
+      background: #333;
+      color: #ffe8c2;
+      border-color: #a6764d;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: #fff6dd;
+      border: 3px dashed #ffc58f;
+      border-radius: 25px;
+      padding: 1.5rem;
+      width: 300px;
+      box-shadow: 6px 6px 12px rgba(100, 60, 30, 0.1);
+      transition: transform 0.2s ease-in-out;
+      position: relative;
+    }
+
+    .dark .card {
+      background: #2b2b2b;
+      border-color: #a6764d;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .box-badge {
+      position: absolute;
+      top: -12px;
+      left: 12px;
+      background-color: #ffcf88;
+      color: #5e3c2c;
+      font-size: 0.75rem;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 12px;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .dark .box-badge {
+      background-color: #8a5a2f;
+      color: #fff6e6;
+    }
+
+    .box-title {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #b45d36;
+      margin-bottom: 0.4rem;
+    }
+
+    .box-price {
+      font-weight: bold;
+      color: #a85429;
+      margin-bottom: 1rem;
+    }
+
+    .item {
+      background-color: #ffe6aa;
+      padding: 0.4rem;
+      border-radius: 10px;
+      margin: 0.3rem 0;
+      font-size: 0.95rem;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .dark .item {
+      background-color: #3a3a3a;
+      color: #fff6e6;
+    }
+
+    .quantity-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+
+    .quantity-controls button {
+      padding: 0.4rem 0.8rem;
+      font-size: 1.2rem;
+      background-color: #f4a261;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .quantity-controls button:hover {
+      background-color: #e76f51;
+    }
+
+    .quantity-input {
+      width: 45px;
+      text-align: center;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      padding: 0.2rem;
+      background-color: #fffbea;
+    }
+
+    #buyAllBtn {
+      margin-top: 2rem;
+      padding: 0.8rem 1.8rem;
+      font-size: 1rem;
+      background-color: #e29578;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    #buyAllBtn:hover {
+      background-color: #d86c56;
+    }
+
+    #summary {
+      margin-top: 1rem;
+      font-size: 1rem;
+      color: #7a4224;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #c28050;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(255, 248, 230, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    #popupBox {
+      background: #fff9db;
+      border: 3px dashed #ffc58f;
+      padding: 2rem 3rem;
+      border-radius: 25px;
+      font-size: 1.5rem;
+      box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
+      animation: pop 0.4s ease-out;
+    }
+
+    .dark #popupBox {
+      background: #2e2e2e;
+      color: #ffd6a0;
+    }
+
+    #popupImage {
+      width: 100px;
+      height: auto;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.7); opacity: 0; }
+      60% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <h1>🍰 Bake Box (❁´◡`❁)</h1>
+  <div class="music-toggle" onclick="toggleMusic()">🎵 Music: <span id="musicStatus">On</span></div>
+  <div class="music-toggle" style="top: 50px;" onclick="toggleDarkMode()">🌗 Mode: <span id="darkModeStatus">Light</span></div>
+
+  <div class="container" id="boxContainer"></div>
+  <div id="summary">No boxes selected.</div>
+  <button id="buyAllBtn">Purchase Selected Boxes</button>
+
+  <div id="overlay">
+    <img id="popupImage" src="https://i.imgur.com/uQ9QnFY.gif" alt="opening box gif" />
+    <div id="popupBox"></div>
+  </div>
+
+  <div class="footer">Set quantity to 0 to skip a box. At least 1 box must be selected.</div>
+
+  <audio id="ding" src="https://cdn.pixabay.com/audio/2022/03/15/audio_90921e5b26.mp3"></audio>
+  <audio id="clickSound" src="./pop-sound-effect.mp3"></audio>
+  <audio id="revealSound" src="./sound-effect-twinklesparkle.mp3"></audio>
+  <audio id="bgm" src="./bgm.mp3" loop autoplay></audio>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <script>
+    const BASE_URL = "http://172.20.10.7:8080";
+    const ding = document.getElementById("ding");
+    const bgm = document.getElementById("bgm");
+    const clickSound = document.getElementById("clickSound");
+    const revealSound = document.getElementById("revealSound");
+    let musicOn = true;
+
+    function toggleMusic() {
+      musicOn = !musicOn;
+      if (musicOn) bgm.play();
+      else bgm.pause();
+      document.getElementById("musicStatus").innerText = musicOn ? "On" : "Off";
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+      document.getElementById("darkModeStatus").innerText =
+        document.body.classList.contains("dark") ? "Dark" : "Light";
+    }
+
+    function playClickSound() {
+      clickSound.currentTime = 0;
+      clickSound.play();
+    }
+
+    const boxQuantities = {};
+
+    async function fetchBoxes() {
+      try {
+        const response = await fetch(`${BASE_URL}/api/boxes`);
+        const boxes = await response.json();
+        renderBoxes(boxes);
+      } catch (error) {
+        document.getElementById("boxContainer").innerHTML = "<p style='color:red;'>Cannot load boxes. Please check the server.</p>";
+      }
+    }
+
+    function updateSummary() {
+      const summaryDiv = document.getElementById("summary");
+      const selected = Object.entries(boxQuantities).filter(([_, qty]) => qty > 0);
+      summaryDiv.textContent = selected.length
+        ? "Selected: " + selected.map(([name, qty]) => `${name} × ${qty}`).join(", ")
+        : "No boxes selected.";
+    }
+
+    function renderBoxes(boxes) {
+      const container = document.getElementById("boxContainer");
+      container.innerHTML = "";
+
+      boxes.forEach(box => {
+        if (boxQuantities[box.boxName] === undefined) boxQuantities[box.boxName] = 0;
+
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const badge = document.createElement("div");
+        badge.className = "box-badge";
+        badge.textContent = "📦 " + box.boxName;
+        card.appendChild(badge);
+
+        card.innerHTML += `
+          <div class="box-title">${box.boxName}</div>
+          <div class="box-price">Price: ฿${box.boxPrice}</div>
+          <div>${box.items.map(i => `<div class="item">${i.itemName} × ${i.itemAmount}</div>`).join("")}</div>
+        `;
+
+        const controls = document.createElement("div");
+        controls.className = "quantity-controls";
+        controls.innerHTML = `
+          <button>−</button>
+          <input type="number" class="quantity-input" min="0" value="${boxQuantities[box.boxName]}" />
+          <button>+</button>
+        `;
+
+        const [minusBtn, qtyInput, plusBtn] = controls.querySelectorAll("button, input");
+        minusBtn.onclick = () => {
+          playClickSound();
+          if (qtyInput.value > 0) qtyInput.value--;
+          boxQuantities[box.boxName] = parseInt(qtyInput.value);
+          updateSummary();
+        };
+        plusBtn.onclick = () => {
+          playClickSound();
+          qtyInput.value++;
+          boxQuantities[box.boxName] = parseInt(qtyInput.value);
+          updateSummary();
+        };
+        qtyInput.oninput = () => {
+          boxQuantities[box.boxName] = Math.max(0, parseInt(qtyInput.value) || 0);
+          updateSummary();
+        };
+
+        card.appendChild(controls);
+        container.appendChild(card);
+      });
+
+      updateSummary();
+    }
+
+    document.getElementById("buyAllBtn").onclick = async function () {
+      playClickSound();
+      const payload = Object.entries(boxQuantities)
+        .filter(([_, qty]) => qty > 0)
+        .map(([boxName, quantity]) => ({ boxName, quantity }));
+
+      if (!payload.length) return alert("⚠️ Please select at least one box to purchase.");
+
+      this.disabled = true;
+      this.textContent = "Processing...";
+
+      const overlay = document.getElementById("overlay");
+      const popup = document.getElementById("popupBox");
+      const gif = document.getElementById("popupImage");
+
+      overlay.style.display = "flex";
+      gif.style.display = "block";
+      popup.innerHTML = "🎁 Opening...";
+
+      try {
+        const response = await fetch(`${BASE_URL}/api/boxes/purchase`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        const items = result.items;
+        let index = 0;
+
+        function showNext() {
+          if (index < items.length) {
+            ding.play();
+            revealSound.pause();
+            revealSound.currentTime = 0;
+            revealSound.play();
+            const item = items[index++];
+            popup.innerHTML = `
+              <div style="font-weight:bold; font-size:1.2rem; margin-bottom:0.5rem;">
+                📦 ${item.box.boxName}
+              </div>
+              🎁${item.itemName}
+            `;
+          } else {
+            confetti();
+            gif.style.display = "none";
+            const grouped = {};
+            items.forEach(item => {
+              const boxName = item.box.boxName;
+              if (!grouped[boxName]) grouped[boxName] = [];
+              grouped[boxName].push(item.itemName);
+            });
+
+            let html = '<h3>You got:</h3><br>';
+            for (const boxName in grouped) {
+              html += `<div style="margin-top: 1rem;"><strong>📦 ${boxName}</strong><br>`;
+              html += grouped[boxName].map(name => `🍩 ${name}`).join("<br>");
+              html += `</div>`;
+            }
+            html += `<br><small>(Click anywhere to close)</small>`;
+            popup.innerHTML = html;
+
+            overlay.onclick = () => overlay.style.display = "none";
+          }
+        }
+
+        overlay.onclick = showNext;
+        showNext();
+        fetchBoxes();
+      } catch (e) {
+        alert("❌ Purchase failed.");
+        overlay.style.display = "none";
+      } finally {
+          this.disabled = false;
+          this.textContent = "Purchase Selected Boxes";
+
+          // Reset all quantities to 0 after purchase
+          Object.keys(boxQuantities).forEach(boxName => {
+            boxQuantities[boxName] = 0;
+          });
+          updateSummary();
+          fetchBoxes(); // Refresh cards visually
+        }
+    };
+
+    fetchBoxes();
+    setInterval(fetchBoxes, 20000);
+  </script>
+</body>
+</html>
