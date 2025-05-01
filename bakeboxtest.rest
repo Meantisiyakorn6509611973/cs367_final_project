@@ -1,0 +1,122 @@
+### [TC01] Get all available boxes
+GET http://localhost:8080/api/boxes
+
+### [TC02] Get box by exact name (Matcha Lover Box)
+GET http://localhost:8080/api/boxes/boxname/Matcha Lover Box
+
+### [TC03] Get all items from all boxes
+GET http://localhost:8080/api/items
+
+### [TC04] Create a new box with full item list (valid)
+POST http://localhost:8080/api/boxes
+Content-Type: application/json
+
+{
+  "boxName": "Japanese Snack Box",
+  "boxPrice": 59,
+  "items": [
+    { "itemName": "Tokyo Banana", "itemPrice": 85, "itemAmount": 4 },
+    { "itemName": "Matcha Pocky", "itemPrice": 45, "itemAmount": 6 },
+    { "itemName": "Yuzu Citrus Candy", "itemPrice": 50, "itemAmount": 5 },
+    { "itemName": "Shiroi Koibito Cookies", "itemPrice": 90, "itemAmount": 3 },
+    { "itemName": "Ume Plum Rice Crackers", "itemPrice": 65, "itemAmount": 4 }
+  ]
+}
+
+### [TC05] Create a box with empty item list
+POST http://localhost:8080/api/boxes
+Content-Type: application/json
+
+{
+  "boxName": "Empty Box",
+  "boxPrice": 10,
+  "items": []
+}
+
+### [TC06] Create a box with missing fields (invalid payload)
+POST http://localhost:8080/api/boxes
+Content-Type: application/json
+
+{
+  "boxName": "Invalid Box"
+}
+
+### [TC07] Purchase 1 Matcha Lover Box (default)
+POST http://localhost:8080/api/boxes/purchase/Matcha Lover Box
+
+### [TC08] Purchase 3 Matcha Lover Boxes
+POST http://localhost:8080/api/boxes/purchase/Matcha Lover Box?quantity=3
+
+### [TC09] Try to purchase more boxes than items available (quantity=99)
+POST http://localhost:8080/api/boxes/purchase/Matcha Lover Box?quantity=99
+
+### [TC10] Purchase a non-existent box
+POST http://localhost:8080/api/boxes/purchase/Nonexistent Box
+
+### Error cases⚠️
+### [TC11] Purchase a box with invalid quantity (negative number)
+POST http://localhost:8080/api/boxes/purchase/Matcha Lover Box?quantity=-5
+
+### [TC12] Purchase multiple box themes (valid names)
+POST http://localhost:8080/api/boxes/purchase
+Content-Type: application/json
+
+[
+  { "boxName": "Matcha Lover Box", "quantity": 2 },
+  { "boxName": "Chocolate Lover Box", "quantity": 1 }
+]
+
+### Error cases⚠️
+### [TC13] Purchase with one valid and one invalid box name
+POST http://localhost:8080/api/boxes/purchase
+Content-Type: application/json
+
+[
+  { "boxName": "Matcha Lover Box", "quantity": 1 },
+  { "boxName": "Nonexistent Box", "quantity": 2 }
+]
+
+### [TC14] Purchase with all invalid box names
+POST http://localhost:8080/api/boxes/purchase
+Content-Type: application/json
+
+[
+  { "boxName": "Fake Box A", "quantity": 1 },
+  { "boxName": "Fake Box B", "quantity": 1 }
+]
+
+### [TC15] Update and delete items with valid actions
+PUT http://localhost:8080/api/items/quantity
+Content-Type: application/json
+
+[
+  { "itemId": 3, "action": "delete" },
+  { "itemId": 4, "action": "update", "deltaAmount": -2 },
+  { "itemId": 5, "action": "update", "deltaAmount": 1000 }
+]
+
+### [TC16] Update item with invalid action keyword
+PUT http://localhost:8080/api/items/quantity
+Content-Type: application/json
+
+[
+  { "itemId": 5, "action": "explode" }
+]
+
+### [TC17] Update non-existent itemId
+PUT http://localhost:8080/api/items/quantity
+Content-Type: application/json
+
+[
+  { "itemId": 9999, "action": "update", "deltaAmount": 2 }
+]
+
+### [TC18] Delete box by valid ID (expect deleted + remaining boxes)
+DELETE http://localhost:8080/api/boxes/1
+Accept: application/json
+
+### [TC19] Delete non-existent box by ID
+DELETE http://localhost:8080/api/boxes/9999
+
+### [TC20] Delete with invalid ID type (string instead of number)
+DELETE http://localhost:8080/api/boxes/abc
