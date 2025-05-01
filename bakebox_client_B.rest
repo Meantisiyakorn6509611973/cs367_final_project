@@ -1,0 +1,50 @@
+### [TC01] Get all available boxes
+GET http://localhost:8080/api/boxes
+
+### [TC02] Get box by exact name (Matcha Lover Box)
+GET http://localhost:8080/api/boxes/boxname/Matcha Lover Box
+
+### [TC03] Get all items from all boxes
+GET http://localhost:8080/api/items
+
+### [TC07] Purchase 1 Matcha Lover Box (default)
+POST http://localhost:8080/api/boxes/purchase/Matcha Lover Box
+
+### [TC08] Purchase 3 Matcha Lover Boxes
+POST http://localhost:8080/api/boxes/purchase/Matcha Lover Box?quantity=3
+
+### [TC09] Try to purchase more boxes than items available (quantity=99)
+POST http://localhost:8080/api/boxes/purchase/Matcha Lover Box?quantity=99
+
+### [TC10] Purchase a non-existent box
+POST http://localhost:8080/api/boxes/purchase/Nonexistent Box
+
+### [TC11] Purchase a box with invalid quantity (negative number)
+POST http://localhost:8080/api/boxes/purchase/Matcha Lover Box?quantity=-5
+
+### [TC12] Purchase multiple box themes (valid names)
+POST http://localhost:8080/api/boxes/purchase
+Content-Type: application/json
+
+[
+  { "boxName": "Matcha Lover Box", "quantity": 2 },
+  { "boxName": "Chocolate Lover Box", "quantity": 1 }
+]
+
+### [TC13] Purchase with one valid and one invalid box name
+POST http://localhost:8080/api/boxes/purchase
+Content-Type: application/json
+
+[
+  { "boxName": "Matcha Lover Box", "quantity": 1 },
+  { "boxName": "Nonexistent Box", "quantity": 2 }
+]
+
+### [TC14] Purchase with all invalid box names
+POST http://localhost:8080/api/boxes/purchase
+Content-Type: application/json
+
+[
+  { "boxName": "Fake Box A", "quantity": 1 },
+  { "boxName": "Fake Box B", "quantity": 1 }
+]
