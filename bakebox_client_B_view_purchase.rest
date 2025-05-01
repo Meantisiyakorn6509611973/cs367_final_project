@@ -1,0 +1,25 @@
+### ▶️ CLIENT B — View & Purchase Interface (172.20.10.2:8080)
+
+### [B-TC01] View all available boxes
+GET http://172.20.10.2:8080/api/boxes
+
+### [B-TC02] View all items in a specific box
+GET http://172.20.10.2:8080/api/boxes/boxname/Matcha Lover Box
+
+### [B-TC03] Submit purchase for 1 box (send to A)
+POST http://172.20.10.7:8080/api/boxes/purchase/Matcha Lover Box
+
+### [B-TC04] Submit purchase for 3 boxes
+POST http://172.20.10.7:8080/api/boxes/purchase/Matcha Lover Box?quantity=3
+
+### [B-TC05] Submit multiple box types
+POST http://172.20.10.7:8080/api/boxes/purchase
+Content-Type: application/json
+
+[
+  { "boxName": "Matcha Lover Box", "quantity": 1 },
+  { "boxName": "Chocolate Lover Box", "quantity": 2 }
+]
+
+### [B-TC06] Ping test
+GET http://172.20.10.2:8080/api/ping
