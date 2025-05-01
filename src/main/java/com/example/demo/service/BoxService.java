@@ -93,52 +93,56 @@ public class BoxService {
         return selectedItems;
     }    
 
-    // Purchase boxes by name, ensuring availability and updating stock
+    // Purchase boxes by name, ensuring total item quantity is sufficient and selecting items randomly
     public List<Item> purchaseBoxesByBoxName(String boxName, int quantity) {
-        // Step 1: Validate that quantity is a positive number
+        // Step 1: Validate quantity is a positive number
         if (quantity <= 0) {
             throw new IllegalStateException("Quantity must be greater than 0.");
         }
-        
-        // Step 2: Find the box by name
+
+        // Step 2: Find the box by its name
         List<Box> boxes = boxRepository.findByBoxName(boxName);
         if (boxes.isEmpty()) {
             throw new IllegalStateException("Error: No box found with name: " + boxName);
         }
-    
+
         Box box = boxes.get(0);
 
-         // Step 3: Get available items from the box
+        // Step 3: Filter out items with zero stock
         List<Item> availableItems = box.getItems().stream()
                 .filter(item -> item.getItemAmount() > 0)
                 .collect(Collectors.toList());
-    
-        // Step 4: Validate that enough items are available
-        if (availableItems.size() < quantity) {
-            throw new IllegalStateException("Error: Not enough different item types available for requested boxes.");
+
+        // Step 4: Calculate total quantity available across all items
+        int totalAvailable = availableItems.stream()
+                .mapToInt(Item::getItemAmount)
+                .sum();
+
+        // Step 5: Ensure total available quantity is sufficient
+        if (totalAvailable < quantity) {
+            throw new IllegalStateException("Error: Not enough total item quantity available for box: " + boxName);
         }
-    
-        // Step 5: Select items to be reduced
+
+        // Step 6: Randomly select items to fulfill the purchase request
         List<Item> selectedItems = new ArrayList<>();
-        List<Item> tempList = new ArrayList<>(availableItems);
-        Collections.shuffle(tempList);
-    
-        for (int i = 0; i < quantity; i++) {
-            Item item = tempList.get(i);
-            if (item.getItemAmount() < 1) {
-                throw new IllegalStateException("Error: Item " + item.getItemName() + " has insufficient stock.");
+        Random random = new Random();
+
+        // Randomly pick items, allowing duplicates if stock permits
+        while (selectedItems.size() < quantity) {
+            Item randomItem = availableItems.get(random.nextInt(availableItems.size()));
+            if (randomItem.getItemAmount() > 0) {
+                selectedItems.add(randomItem);
+                // Deduct 1 from stock immediately (in-memory update)
+                randomItem.setItemAmount(randomItem.getItemAmount() - 1);
             }
-            selectedItems.add(item);
         }
-    
-        // Step 6: Deduct item amounts only after validation
-        for (Item item : selectedItems) {
-            item.setItemAmount(item.getItemAmount() - 1);
-        }
-        itemRepository.saveAll(selectedItems);
-    
+
+        // Step 7: Persist updated item quantities to the database
+        itemRepository.saveAll(availableItems);
+
+        // Step 8: Return the randomly selected items as response
         return selectedItems;
-    }    
+    }
 
     public List<Item> purchaseMultipleBoxes(List<BoxPurchaseRequest> boxRequests) {
         List<Item> allSelectedItems = new ArrayList<>();
