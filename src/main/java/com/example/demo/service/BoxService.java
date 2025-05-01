@@ -95,21 +95,30 @@ public class BoxService {
 
     // Purchase boxes by name, ensuring availability and updating stock
     public List<Item> purchaseBoxesByBoxName(String boxName, int quantity) {
+        // Step 1: Validate that quantity is a positive number
+        if (quantity <= 0) {
+            throw new IllegalStateException("Quantity must be greater than 0.");
+        }
+        
+        // Step 2: Find the box by name
         List<Box> boxes = boxRepository.findByBoxName(boxName);
         if (boxes.isEmpty()) {
             throw new IllegalStateException("Error: No box found with name: " + boxName);
         }
     
         Box box = boxes.get(0);
+
+         // Step 3: Get available items from the box
         List<Item> availableItems = box.getItems().stream()
                 .filter(item -> item.getItemAmount() > 0)
                 .collect(Collectors.toList());
     
+        // Step 4: Validate that enough items are available
         if (availableItems.size() < quantity) {
             throw new IllegalStateException("Error: Not enough different item types available for requested boxes.");
         }
     
-        // Check if each item can support reduction without modifying anything yet
+        // Step 5: Select items to be reduced
         List<Item> selectedItems = new ArrayList<>();
         List<Item> tempList = new ArrayList<>(availableItems);
         Collections.shuffle(tempList);
@@ -122,7 +131,7 @@ public class BoxService {
             selectedItems.add(item);
         }
     
-        // All checks passed, now deduct quantities and save
+        // Step 6: Deduct item amounts only after validation
         for (Item item : selectedItems) {
             item.setItemAmount(item.getItemAmount() - 1);
         }
@@ -131,14 +140,56 @@ public class BoxService {
         return selectedItems;
     }    
 
-    // Purchase multiple boxes by request list
     public List<Item> purchaseMultipleBoxes(List<BoxPurchaseRequest> boxRequests) {
-        List<Item> allItems = new ArrayList<>();
+        List<Item> allSelectedItems = new ArrayList<>();
+    
+        // First phase: Validate all boxes and prepare item selections
         for (BoxPurchaseRequest request : boxRequests) {
-            allItems.addAll(purchaseBoxesByBoxName(request.getBoxName(), request.getQuantity()));
+            String boxName = request.getBoxName();
+            int quantity = request.getQuantity();
+    
+            // Validate quantity is positive
+            if (quantity <= 0) {
+                throw new IllegalStateException("Quantity must be greater than 0 for box: " + boxName);
+            }
+
+            List<Box> boxes = boxRepository.findByBoxName(boxName);
+            if (boxes.isEmpty()) {
+                throw new IllegalStateException("Error: No box found with name: " + boxName);
+            }
+    
+            Box box = boxes.get(0);
+            List<Item> availableItems = box.getItems().stream()
+                    .filter(item -> item.getItemAmount() > 0)
+                    .collect(Collectors.toList());
+    
+            if (availableItems.size() < quantity) {
+                throw new IllegalStateException("Error: Not enough item types for box: " + boxName);
+            }
+    
+            List<Item> shuffled = new ArrayList<>(availableItems);
+            Collections.shuffle(shuffled);
+    
+            List<Item> selected = new ArrayList<>();
+            for (int i = 0; i < quantity; i++) {
+                Item item = shuffled.get(i);
+                if (item.getItemAmount() <= 0) {
+                    throw new IllegalStateException("Error: Item " + item.getItemName() + " is out of stock.");
+                }
+                selected.add(item);
+            }
+    
+            allSelectedItems.addAll(selected);
         }
-        return allItems;
-    }
+    
+        // Second phase: Apply changes
+        for (Item item : allSelectedItems) {
+            item.setItemAmount(item.getItemAmount() - 1);
+        }
+        itemRepository.saveAll(allSelectedItems);
+    
+        return allSelectedItems;
+    }    
 
      // Add items to an existing box
     public Box addItemsToExistingBoxAndReturnFullBox(Long boxId, List<Item> items) {
