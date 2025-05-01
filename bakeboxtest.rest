@@ -53,7 +53,6 @@ POST http://localhost:8080/api/boxes/purchase/Matcha Lover Box?quantity=99
 ### [TC10] Purchase a non-existent box
 POST http://localhost:8080/api/boxes/purchase/Nonexistent Box
 
-### Error cases⚠️
 ### [TC11] Purchase a box with invalid quantity (negative number)
 POST http://localhost:8080/api/boxes/purchase/Matcha Lover Box?quantity=-5
 
@@ -66,7 +65,6 @@ Content-Type: application/json
   { "boxName": "Chocolate Lover Box", "quantity": 1 }
 ]
 
-### Error cases⚠️
 ### [TC13] Purchase with one valid and one invalid box name
 POST http://localhost:8080/api/boxes/purchase
 Content-Type: application/json
@@ -120,3 +118,6 @@ DELETE http://localhost:8080/api/boxes/9999
 
 ### [TC20] Delete with invalid ID type (string instead of number)
 DELETE http://localhost:8080/api/boxes/abc
+
+### [TC21] Test History API (GET all purchases)
+GET http://localhost:8080/api/history
