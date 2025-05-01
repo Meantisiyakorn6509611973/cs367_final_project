@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bakery Box Display</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff8f0;
+      color: #5e3c2c;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    h1 {
+      color: #a66c47;
+      margin-bottom: 1rem;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: center;
+    }
+
+    .card {
+      background-color: #fff3c4;
+      border: 3px solid #d6a76e;
+      border-radius: 20px;
+      padding: 1.5rem;
+      width: 300px;
+      box-shadow: 4px 4px 10px rgba(100, 70, 50, 0.2);
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .card:hover {
+      transform: scale(1.02);
+    }
+
+    .box-title {
+      font-size: 1.5rem;
+      color: #a66c47;
+      margin-bottom: 0.5rem;
+    }
+
+    .box-price {
+      font-weight: bold;
+      color: #5e3c2c;
+      margin-bottom: 1rem;
+    }
+
+    .item {
+      margin: 0.25rem 0;
+      padding: 0.5rem;
+      background-color: #ffeeb0;
+      border-radius: 8px;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #a66c47;
+    }
+  </style>
+</head>
+<body>
+  <h1>🍰 Matcha Bakery Boxes</h1>
+  <div class="container" id="boxContainer"></div>
+  <div class="footer">Auto-updates every 30 seconds</div>
+
+  <script>
+    // 🌐 Configurable base URL
+    const BASE_URL = "http://172.20.10.7:8080";
+
+    async function fetchBoxes() {
+      try {
+        const response = await fetch(`${BASE_URL}/api/boxes`);
+        const boxes = await response.json();
+        renderBoxes(boxes);
+      } catch (error) {
+        console.error("Failed to fetch box data:", error);
+        document.getElementById("boxContainer").innerHTML = `<p style="color:red;">Could not fetch data. Please check your server connection.</p>`;
+      }
+    }
+
+    function renderBoxes(boxes) {
+      const container = document.getElementById("boxContainer");
+      container.innerHTML = ""; // Clear previous content
+
+      boxes.forEach(box => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const boxName = document.createElement("div");
+        boxName.className = "box-title";
+        boxName.textContent = box.boxName;
+
+        const boxPrice = document.createElement("div");
+        boxPrice.className = "box-price";
+        boxPrice.textContent = `Box Price: ฿${box.boxPrice}`;
+
+        card.appendChild(boxName);
+        card.appendChild(boxPrice);
+
+        box.items.forEach(item => {
+          const itemEl = document.createElement("div");
+          itemEl.className = "item";
+          itemEl.textContent = `${item.itemName} × ${item.itemAmount} `;
+          card.appendChild(itemEl);
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    // Load data immediately
+    fetchBoxes();
+    // Reload every 30 seconds
+    setInterval(fetchBoxes, 30000);
+  </script>
+</body>
+</html>
