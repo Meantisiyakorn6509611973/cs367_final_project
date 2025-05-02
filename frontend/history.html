@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Enable dark mode on load if stored in localStorage -->
   <script>
     if (localStorage.getItem("darkMode") === "true") {
       document.documentElement.classList.add("dark");
     }
-  </script>  
-  
+  </script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Purchase History</title>
 
   <style>
+    /* === Light & Dark Mode Base Styling === */
     html.dark, html.dark body {
       background-color: #1a1a1a;
       color: #ffe8c2;
@@ -25,17 +27,13 @@
       text-align: center;
     }
 
-    html.dark {
-      background-color: #1a1a1a;
-      color: #ffe8c2;
-    }
-
     h1 {
       color: #d88b4c;
       font-size: 2rem;
       margin-bottom: 1.5rem;
     }
 
+    /* === Entry Cards === */
     .history-entry {
       background: #fff8e1;
       margin: 0.8rem auto;
@@ -53,6 +51,7 @@
       color: #ffe8c2;
     }
 
+    /* === Back Button Styling === */
     .back-button {
       position: fixed;
       top: 10px;
@@ -83,31 +82,31 @@
   </style>
 </head>
 <body>
-  <h1>📜 Purchase History</h1>
+  <h1>📜 Purchase History (☆▽☆)</h1>
   <a href="index.html" class="back-button">← Back</a>
   <div id="historyContainer">Loading...</div>
 
-  <!-- Background music (hidden) -->
+  <!-- 🎵 Background Music (auto-plays if enabled) -->
   <audio id="bgm" src="./bgm.mp3" loop></audio>
 
   <script>
-    // === BGM Setup ===
+    // === Setup Background Music with Resume & Volume ===
     const bgm = document.getElementById("bgm");
-    bgm.volume = 0.5; // Set smoother volume (range: 0.0 to 1.0)
-    let musicOn = localStorage.getItem("musicOn") !== "false";
+    bgm.volume = 0.5;
+    const musicOn = localStorage.getItem("musicOn") !== "false";
     const savedTime = parseFloat(localStorage.getItem("bgmTime")) || 0;
     bgm.currentTime = savedTime;
-
     if (musicOn) bgm.play();
 
+    // Save current time periodically to resume later
     setInterval(() => {
       if (!bgm.paused) {
         localStorage.setItem("bgmTime", bgm.currentTime);
       }
     }, 1000);
 
-    // === Fetch and Display History ===
-    const BASE_URL = "http://172.20.10.7:8080";  // adjust if using another IP
+    // === Fetch and Render Purchase History ===
+    const BASE_URL = "http://172.20.10.7:8080"; // adjust IP if needed
 
     async function fetchHistory() {
       try {
@@ -120,7 +119,8 @@
           return;
         }
 
-        container.innerHTML = history.map(entry => `
+        // Show newest purchases first
+        container.innerHTML = history.reverse().map(entry => `
           <div class="history-entry">
             <b>Box:</b> ${entry.boxName}<br/>
             <b>Item:</b> ${entry.itemName}<br/>
@@ -128,7 +128,8 @@
           </div>
         `).join("");
       } catch (err) {
-        document.getElementById("historyContainer").innerHTML = "<p style='color:red;'>Failed to load history.</p>";
+        document.getElementById("historyContainer").innerHTML =
+          "<p style='color:red;'>Failed to load history.</p>";
       }
     }
 
