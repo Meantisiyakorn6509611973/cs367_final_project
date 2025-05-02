@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark");
+    }
+  </script>
+  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Purchase History</title>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fdf6f0;
+      color: #4b2e2e;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    body.dark {
+      background-color: #1a1a1a;
+      color: #ffe8c2;
+    }
+
+    h1 {
+      color: #d88b4c;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .history-entry {
+      background: #fff8e1;
+      margin: 0.8rem auto;
+      padding: 1rem;
+      border-radius: 12px;
+      max-width: 500px;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.05);
+      border-left: 5px solid #ffbb6c;
+      text-align: left;
+    }
+
+    body.dark .history-entry {
+      background-color: #2e2e2e;
+      border-left-color: #a6764d;
+      color: #ffe8c2;
+    }
+
+    .back-button {
+      position: fixed;
+      top: 10px;
+      left: 20px;
+      background: #fff6dd;
+      border: 2px solid #ffc58f;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      color: #a45b37;
+      text-decoration: none;
+      z-index: 10000;
+    }
+
+    html.dark .back-button {
+      background: #333;
+      color: #ffe8c2;
+      border-color: #a6764d;
+    }
+
+    .back-button:hover {
+      background-color: #ffe8cc;
+    }
+
+    html.dark .back-button:hover {
+      background-color: #444;
+    }
+  </style>
+</head>
+<body>
+  <h1>📜 Purchase History</h1>
+  <a href="index.html" class="back-button">← Back</a>
+  <div id="historyContainer">Loading...</div>
+
+  <!-- Background music (hidden) -->
+  <audio id="bgm" src="./bgm.mp3" loop></audio>
+
+  <script>
+    // === BGM Setup ===
+    const bgm = document.getElementById("bgm");
+    bgm.volume = 0.5; // Set smoother volume (range: 0.0 to 1.0)
+    let musicOn = localStorage.getItem("musicOn") !== "false";
+    const savedTime = parseFloat(localStorage.getItem("bgmTime")) || 0;
+    bgm.currentTime = savedTime;
+
+    if (musicOn) bgm.play();
+
+    setInterval(() => {
+      if (!bgm.paused) {
+        localStorage.setItem("bgmTime", bgm.currentTime);
+      }
+    }, 1000);
+
+    // === Fetch and Display History ===
+    const BASE_URL = "http://localhost:8080";  // adjust if using another IP
+
+    async function fetchHistory() {
+      try {
+        const res = await fetch(`${BASE_URL}/api/history`);
+        const history = await res.json();
+        const container = document.getElementById("historyContainer");
+
+        if (history.length === 0) {
+          container.innerHTML = "<p>No purchase history yet.</p>";
+          return;
+        }
+
+        container.innerHTML = history.map(entry => `
+          <div class="history-entry">
+            <b>Box:</b> ${entry.boxName}<br/>
+            <b>Item:</b> ${entry.itemName}<br/>
+            <small>🕒 ${new Date(entry.purchasedAt).toLocaleString()}</small>
+          </div>
+        `).join("");
+      } catch (err) {
+        document.getElementById("historyContainer").innerHTML = "<p style='color:red;'>Failed to load history.</p>";
+      }
+    }
+
+    fetchHistory();
+  </script>
+</body>
+</html>

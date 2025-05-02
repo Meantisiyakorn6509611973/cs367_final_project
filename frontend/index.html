@@ -1,10 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark");
+    }
+  </script>
+  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bakery Box Multi-Purchase</title>
+  <title>Bake Box</title>
+  
+  <!-- ========== STYLES ========== -->
   <style>
+    /* ========== Base Page Styling ========== */
     body {
       font-family: 'Segoe UI', sans-serif;
       background-color: #fff4e6;
@@ -12,7 +21,6 @@
       padding: 2rem;
       text-align: center;
     }
-
     body.dark {
       background-color: #1a1a1a;
       color: #ffe8c2;
@@ -25,30 +33,36 @@
       text-shadow: 1px 1px #fff0da;
     }
 
-    .music-toggle {
+    /* ========== Utility Buttons (Top Right & Left) ========== */
+    .music-toggle, .history-button {
       position: fixed;
-      top: 10px;
-      right: 20px;
-      background: #fff6dd;
-      border: 2px solid #ffc58f;
       padding: 8px 16px;
       border-radius: 12px;
-      cursor: pointer;
       font-size: 0.9rem;
+      cursor: pointer;
+      background: #fff6dd;
+      border: 2px solid #ffc58f;
       color: #a45b37;
+      z-index: 10000;
+      text-decoration: none;
     }
+    .music-toggle { top: 10px; right: 20px; }
+    .music-toggle:nth-of-type(2) { top: 50px; } /* dark mode toggle */
+    .history-button { top: 10px; left: 20px; }
 
-    .dark .music-toggle {
+    .dark .music-toggle,
+    .dark .history-button {
       background: #333;
       color: #ffe8c2;
       border-color: #a6764d;
     }
 
+    /* ========== Responsive Card Layout ========== */
     .container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 1.5rem;
+      padding: 0 1rem;
     }
 
     .card {
@@ -56,20 +70,16 @@
       border: 3px dashed #ffc58f;
       border-radius: 25px;
       padding: 1.5rem;
-      width: 300px;
       box-shadow: 6px 6px 12px rgba(100, 60, 30, 0.1);
       transition: transform 0.2s ease-in-out;
       position: relative;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
-    .dark .card {
-      background: #2b2b2b;
-      border-color: #a6764d;
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
-    }
+    .card:hover { transform: translateY(-5px); }
+    .dark .card { background: #2b2b2b; border-color: #a6764d; }
 
     .box-badge {
       position: absolute;
@@ -83,24 +93,10 @@
       border-radius: 12px;
       box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
     }
+    .dark .box-badge { background-color: #8a5a2f; color: #fff6e6; }
 
-    .dark .box-badge {
-      background-color: #8a5a2f;
-      color: #fff6e6;
-    }
-
-    .box-title {
-      font-size: 1.6rem;
-      font-weight: bold;
-      color: #b45d36;
-      margin-bottom: 0.4rem;
-    }
-
-    .box-price {
-      font-weight: bold;
-      color: #a85429;
-      margin-bottom: 1rem;
-    }
+    .box-title { font-size: 1.6rem; font-weight: bold; color: #b45d36; margin-bottom: 0.4rem; }
+    .box-price { font-weight: bold; color: #a85429; margin-bottom: 1rem; }
 
     .item {
       background-color: #ffe6aa;
@@ -110,12 +106,9 @@
       font-size: 0.95rem;
       box-shadow: 1px 1px 3px rgba(0,0,0,0.05);
     }
+    .dark .item { background-color: #3a3a3a; color: #fff6e6; }
 
-    .dark .item {
-      background-color: #3a3a3a;
-      color: #fff6e6;
-    }
-
+    /* ========== Quantity Controls ========== */
     .quantity-controls {
       display: flex;
       justify-content: center;
@@ -123,7 +116,6 @@
       gap: 0.5rem;
       margin: 1rem 0;
     }
-
     .quantity-controls button {
       padding: 0.4rem 0.8rem;
       font-size: 1.2rem;
@@ -132,13 +124,8 @@
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      transition: background-color 0.2s;
     }
-
-    .quantity-controls button:hover {
-      background-color: #e76f51;
-    }
-
+    .quantity-controls button:hover { background-color: #e76f51; }
     .quantity-input {
       width: 45px;
       text-align: center;
@@ -149,6 +136,7 @@
       background-color: #fffbea;
     }
 
+    /* ========== Purchase Button & Summary ========== */
     #buyAllBtn {
       margin-top: 2rem;
       padding: 0.8rem 1.8rem;
@@ -158,25 +146,11 @@
       border: none;
       border-radius: 12px;
       cursor: pointer;
-      transition: background-color 0.2s;
     }
+    #buyAllBtn:hover { background-color: #d86c56; }
+    #summary { margin-top: 1rem; font-size: 1rem; color: #7a4224; }
 
-    #buyAllBtn:hover {
-      background-color: #d86c56;
-    }
-
-    #summary {
-      margin-top: 1rem;
-      font-size: 1rem;
-      color: #7a4224;
-    }
-
-    .footer {
-      margin-top: 2rem;
-      font-size: 0.9rem;
-      color: #c28050;
-    }
-
+    /* ========== Popup Overlay ========== */
     #overlay {
       position: fixed;
       top: 0; left: 0;
@@ -189,115 +163,211 @@
       flex-direction: column;
       cursor: pointer;
     }
-
     #popupBox {
       background: #fff9db;
-      border: 3px dashed #ffc58f;
-      padding: 2rem 3rem;
-      border-radius: 25px;
-      font-size: 1.5rem;
-      box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
+      border: 2px dashed #ffc58f;
+      padding: 1rem 1.5rem;
+      border-radius: 18px;
+      font-size: 1rem;
+      max-width: 320px;
+      box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
       animation: pop 0.4s ease-out;
     }
-
-    .dark #popupBox {
-      background: #2e2e2e;
-      color: #ffd6a0;
-    }
+    .dark #popupBox { background: #2e2e2e; color: #ffd6a0; }
 
     #popupImage {
       width: 100px;
       height: auto;
       margin-bottom: 1rem;
     }
+    #popupBox button {
+      background-color: #e6b17e;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    #popupBox button:hover { background-color: #d78b5a; }
 
     @keyframes pop {
       0% { transform: scale(0.7); opacity: 0; }
       60% { transform: scale(1.2); opacity: 1; }
       100% { transform: scale(1); }
     }
+
+    /* ========== Footer ========== */
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #c28050;
+    }
   </style>
 </head>
 <body>
+  <!-- Title and Toggle Buttons -->
   <h1>🍰 Bake Box (❁´◡`❁)</h1>
   <div class="music-toggle" onclick="toggleMusic()">🎵 Music: <span id="musicStatus">On</span></div>
   <div class="music-toggle" style="top: 50px;" onclick="toggleDarkMode()">🌗 Mode: <span id="darkModeStatus">Light</span></div>
+  <a href="history.html" class="history-button">📜 History</a>
 
+  <!-- Box Container and Controls -->
   <div class="container" id="boxContainer"></div>
   <div id="summary">No boxes selected.</div>
   <button id="buyAllBtn">Purchase Selected Boxes</button>
 
+  <!-- Popup Overlay for Box Opening -->
   <div id="overlay">
-    <img id="popupImage" src="https://i.imgur.com/uQ9QnFY.gif" alt="opening box gif" />
+    <img id="popupImage" src="./cake_kouji.gif" alt="opening box gif" />
     <div id="popupBox"></div>
   </div>
 
   <div class="footer">Set quantity to 0 to skip a box. At least 1 box must be selected.</div>
 
+  <!-- Audio Elements -->
   <audio id="ding" src="https://cdn.pixabay.com/audio/2022/03/15/audio_90921e5b26.mp3"></audio>
   <audio id="clickSound" src="./pop-sound-effect.mp3"></audio>
   <audio id="revealSound" src="./sound-effect-twinklesparkle.mp3"></audio>
-  <audio id="bgm" src="./bgm.mp3" loop autoplay></audio>
+  <audio id="bgm" src="./bgm.mp3" loop></audio>
+  
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  
   <script>
-    const BASE_URL = "http://172.20.10.7:8080";
-    const ding = document.getElementById("ding");
-    const bgm = document.getElementById("bgm");
-    const clickSound = document.getElementById("clickSound");
-    const revealSound = document.getElementById("revealSound");
-    let musicOn = true;
+    // ========== Configuration and Audio Elements ==========
+    const BASE_URL = "http://172.20.10.7:8080";  // Backend server base URL
+    const ding = document.getElementById("ding");            // Sound when an item appears
+    const clickSound = document.getElementById("clickSound"); // Sound effect for clicks
+    const revealSound = document.getElementById("revealSound"); // Sound when an item is revealed
 
+    // Load and apply saved dark mode
+    const savedDark = localStorage.getItem("darkMode") === "true";
+    if (savedDark) {
+      document.body.classList.add("dark");
+      const darkStatus = document.getElementById("darkModeStatus");
+      if (darkStatus) darkStatus.innerText = "Dark";
+    }
+
+    // ========== Music BGM Control ==========
+    const bgm = document.getElementById("bgm");
+    bgm.volume = 0.5; // Set smoother volume (range: 0.0 to 1.0)
+    let musicOn = localStorage.getItem("musicOn") !== "false";
+
+    // Resume bgm from saved time (if available)
+    const savedTime = parseFloat(localStorage.getItem("bgmTime")) || 0;
+    bgm.currentTime = savedTime;
+
+    // Play music if musicOn is true
+    if (musicOn) {
+      bgm.play();
+      document.getElementById("musicStatus").innerText = "On";
+    } else {
+      document.getElementById("musicStatus").innerText = "Off";
+    }
+
+    // Save currentTime every 1 second
+    setInterval(() => {
+      if (!bgm.paused) {
+        localStorage.setItem("bgmTime", bgm.currentTime);
+      }
+    }, 1000);
+
+    // ========== Toggle Music On/Off ==========
     function toggleMusic() {
       musicOn = !musicOn;
-      if (musicOn) bgm.play();
-      else bgm.pause();
+      localStorage.setItem("musicOn", musicOn);
       document.getElementById("musicStatus").innerText = musicOn ? "On" : "Off";
+      musicOn ? bgm.play() : bgm.pause();
     }
 
+    // Apply dark mode on page load if saved
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark");
+    }
+
+    // === Dark Mode Setup ===
+    const modeStatus = document.getElementById("darkModeStatus");
+    if (modeStatus) {
+      modeStatus.innerText = document.body.classList.contains("dark") ? "Dark" : "Light";
+    }
+
+    // ========== Toggle Light/Dark Mode ==========
     function toggleDarkMode() {
       document.body.classList.toggle("dark");
-      document.getElementById("darkModeStatus").innerText =
-        document.body.classList.contains("dark") ? "Dark" : "Light";
+      const isDark = document.body.classList.contains("dark");
+      localStorage.setItem("darkMode", isDark);
+      document.getElementById("darkModeStatus").innerText = isDark ? "Dark" : "Light";
     }
 
+    // ========== Play Sound on Button Click ==========
     function playClickSound() {
-      clickSound.currentTime = 0;
-      clickSound.play();
+      clickSound.currentTime = 0; // Reset sound
+      clickSound.play();          // Play click sound
     }
 
-    const boxQuantities = {};
+    // ========== Open History Panel with Fetch ==========
+    async function openHistory() {
+      try {
+        const res = await fetch(`${BASE_URL}/api/history`);
+        const history = await res.json();
+        const popup = document.getElementById("historyPopup");
 
+        // Construct and display each history entry
+        popup.innerHTML = "<h3>🕒 Purchase History</h3>" + history.map(entry => `
+          <div class="history-entry">
+            <b>${entry.boxName}</b> — ${entry.itemName}<br/>
+            <small>${new Date(entry.purchasedAt).toLocaleString()}</small>
+          </div>
+        `).join("") + "<p><small>(Click anywhere to close)</small></p>";
+        
+        popup.style.display = "block";
+      } catch (err) {
+        alert("Failed to load history.");
+      }
+    }
+
+    // ========== Object to Track Selected Quantities ==========
+    const boxQuantities = {}; // { boxName: quantity }
+
+    // ========== Fetch All Boxes from Server ==========
     async function fetchBoxes() {
       try {
         const response = await fetch(`${BASE_URL}/api/boxes`);
         const boxes = await response.json();
-        renderBoxes(boxes);
+        renderBoxes(boxes); // Render all boxes visually
       } catch (error) {
-        document.getElementById("boxContainer").innerHTML = "<p style='color:red;'>Cannot load boxes. Please check the server.</p>";
+        document.getElementById("boxContainer").innerHTML =
+          "<p style='color:red;'>Cannot load boxes. Please check the server.</p>";
       }
     }
 
+    // ========== Update Summary Line Below Boxes ==========
     function updateSummary() {
       const summaryDiv = document.getElementById("summary");
       const selected = Object.entries(boxQuantities).filter(([_, qty]) => qty > 0);
+
+      // Show count of each selected box
       summaryDiv.textContent = selected.length
         ? "Selected: " + selected.map(([name, qty]) => `${name} × ${qty}`).join(", ")
         : "No boxes selected.";
     }
 
+    // ========== Render All Box Cards ==========
     function renderBoxes(boxes) {
       const container = document.getElementById("boxContainer");
-      container.innerHTML = "";
+      container.innerHTML = ""; // Clear container
 
       boxes.forEach(box => {
-        if (boxQuantities[box.boxName] === undefined) boxQuantities[box.boxName] = 0;
+        if (boxQuantities[box.boxName] === undefined)
+          boxQuantities[box.boxName] = 0;
 
         const card = document.createElement("div");
         card.className = "card";
 
         const badge = document.createElement("div");
         badge.className = "box-badge";
-        badge.textContent = "📦 " + box.boxName;
+        badge.textContent = "🍫" + box.boxName;
         card.appendChild(badge);
 
         card.innerHTML += `
@@ -306,6 +376,7 @@
           <div>${box.items.map(i => `<div class="item">${i.itemName} × ${i.itemAmount}</div>`).join("")}</div>
         `;
 
+        // Quantity selector controls
         const controls = document.createElement("div");
         controls.className = "quantity-controls";
         controls.innerHTML = `
@@ -315,18 +386,24 @@
         `;
 
         const [minusBtn, qtyInput, plusBtn] = controls.querySelectorAll("button, input");
+
+        // Event: Decrease quantity
         minusBtn.onclick = () => {
           playClickSound();
           if (qtyInput.value > 0) qtyInput.value--;
           boxQuantities[box.boxName] = parseInt(qtyInput.value);
           updateSummary();
         };
+
+        // Event: Increase quantity
         plusBtn.onclick = () => {
           playClickSound();
           qtyInput.value++;
           boxQuantities[box.boxName] = parseInt(qtyInput.value);
           updateSummary();
         };
+
+        // Event: Manual number input
         qtyInput.oninput = () => {
           boxQuantities[box.boxName] = Math.max(0, parseInt(qtyInput.value) || 0);
           updateSummary();
@@ -339,8 +416,11 @@
       updateSummary();
     }
 
+    // ========== Handle Purchase Button Click ==========
     document.getElementById("buyAllBtn").onclick = async function () {
       playClickSound();
+      
+      // Build payload from selected boxes
       const payload = Object.entries(boxQuantities)
         .filter(([_, qty]) => qty > 0)
         .map(([boxName, quantity]) => ({ boxName, quantity }));
@@ -356,9 +436,10 @@
 
       overlay.style.display = "flex";
       gif.style.display = "block";
-      popup.innerHTML = "🎁 Opening...";
+      popup.innerHTML = "Opening...";
 
       try {
+        // Send purchase request
         const response = await fetch(`${BASE_URL}/api/boxes/purchase`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -374,6 +455,7 @@
         const items = result.items;
         let index = 0;
 
+        // Display items one-by-one
         function showNext() {
           if (index < items.length) {
             ding.play();
@@ -382,14 +464,11 @@
             revealSound.play();
             const item = items[index++];
             popup.innerHTML = `
-              <div style="font-weight:bold; font-size:1.2rem; margin-bottom:0.5rem;">
-                📦 ${item.box.boxName}
-              </div>
-              🎁${item.itemName}
+              <div style="font-weight:bold; font-size:1rem; margin-bottom:0.4rem;">${item.box.boxName}</div>
+              <div style="font-size: 0.95rem;">🎁 ${item.itemName}</div>
             `;
           } else {
-            confetti();
-            gif.style.display = "none";
+            // Group by box for final display
             const grouped = {};
             items.forEach(item => {
               const boxName = item.box.boxName;
@@ -397,41 +476,67 @@
               grouped[boxName].push(item.itemName);
             });
 
-            let html = '<h3>You got:</h3><br>';
-            for (const boxName in grouped) {
-              html += `<div style="margin-top: 1rem;"><strong>📦 ${boxName}</strong><br>`;
-              html += grouped[boxName].map(name => `🍩 ${name}`).join("<br>");
-              html += `</div>`;
-            }
-            html += `<br><small>(Click anywhere to close)</small>`;
-            popup.innerHTML = html;
+            const boxNames = Object.keys(grouped);
+            let currentBoxIndex = 0;
 
-            overlay.onclick = () => overlay.style.display = "none";
+            // Paginated popup for each box
+            function renderBoxPage(index) {
+              const boxName = boxNames[index];
+              const itemList = grouped[boxName];
+              popup.innerHTML = `
+                <div style="font-size: 1.6rem; font-weight: bold; color: #b45d36; margin-bottom: 0.4rem;">You Got:</div>
+                <div style="font-weight:bold; font-size:1rem; margin-bottom:0.4rem;">${boxName}</div>
+                <div>${itemList.map(name => `🎁 ${name}`).join("<br>")}</div>
+                <div style="margin-top: 1rem;">
+                  <button id="prevBoxBtn">Prev</button>
+                  <span style="margin: 0 1rem;">${index + 1} / ${boxNames.length}</span>
+                  <button id="nextBoxBtn">Next</button>
+                </div>
+              `;
+
+              // Navigation controls
+              document.getElementById("prevBoxBtn").onclick = (e) => {
+                e.stopPropagation();
+                currentBoxIndex = (currentBoxIndex - 1 + boxNames.length) % boxNames.length;
+                renderBoxPage(currentBoxIndex);
+              };
+              document.getElementById("nextBoxBtn").onclick = (e) => {
+                e.stopPropagation();
+                currentBoxIndex = (currentBoxIndex + 1) % boxNames.length;
+                renderBoxPage(currentBoxIndex);
+              };
+            }
+
+            renderBoxPage(currentBoxIndex);
+
+            // Allow closing overlay by click outside
+            overlay.onclick = () => overlay.style.display = "none"; // Close on click
           }
         }
 
         overlay.onclick = showNext;
-        showNext();
-        fetchBoxes();
+        showNext(); // Start animation
+        fetchBoxes(); // Refresh UI
       } catch (e) {
         alert("❌ " + e.message);
         overlay.style.display = "none";
       } finally {
-          this.disabled = false;
-          this.textContent = "Purchase Selected Boxes";
+        this.disabled = false;
+        this.textContent = "Purchase Selected Boxes";
 
-          // Reset all quantities to 0 after purchase
-          Object.keys(boxQuantities).forEach(boxName => {
-            boxQuantities[boxName] = 0;
-          });
-          updateSummary();
-          fetchBoxes(); // Refresh cards visually
-        }
-
+        // Reset all quantities to 0 after purchase
+        Object.keys(boxQuantities).forEach(boxName => boxQuantities[boxName] = 0);
+        updateSummary();
+        fetchBoxes(); // Refresh cards visually
+      }
     };
 
+    // Initial fetch and periodic refresh every 20 seconds
     fetchBoxes();
     setInterval(fetchBoxes, 20000);
   </script>
+
+  <div id="historyPopup" onclick="this.style.display='none'"></div>
+
 </body>
 </html>
