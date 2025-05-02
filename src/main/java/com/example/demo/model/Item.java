@@ -2,7 +2,9 @@
 
 package com.example.demo.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -24,8 +26,7 @@ public class Item {
 
     @ManyToOne
     @JoinColumn(name = "box_id")
-    @JsonBackReference
-    // Reference to the box that this item belongs to
+    @JsonIgnoreProperties({"items"})  // prevent infinite loop but allow boxName
     private Box box;
 
     // Default constructor

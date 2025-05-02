@@ -365,6 +365,11 @@
           body: JSON.stringify(payload)
         });
 
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.error || "Unknown error");
+        }
+
         const result = await response.json();
         const items = result.items;
         let index = 0;
@@ -409,7 +414,7 @@
         showNext();
         fetchBoxes();
       } catch (e) {
-        alert("❌ Purchase failed.");
+        alert("❌ " + e.message);
         overlay.style.display = "none";
       } finally {
           this.disabled = false;
@@ -422,6 +427,7 @@
           updateSummary();
           fetchBoxes(); // Refresh cards visually
         }
+
     };
 
     fetchBoxes();
