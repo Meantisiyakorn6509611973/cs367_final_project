@@ -169,7 +169,7 @@
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background-color: rgba(0, 0, 0, 0.2);
+      background-color: rgba(0, 0, 0, 0.3);
       display: none;
       justify-content: center;
       align-items: center;
@@ -177,6 +177,11 @@
       flex-direction: column;
       cursor: pointer;
     }
+
+    html.dark #overlay {
+      background-color: rgba(0, 0, 0, 0.6);
+    }
+    
     #popupBox {
       background: #fff9db;
       border: 2px dashed #ffc58f;
