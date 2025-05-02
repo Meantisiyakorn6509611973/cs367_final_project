@@ -3,7 +3,7 @@
 <head>
   <script>
     if (localStorage.getItem("darkMode") === "true") {
-      document.body.classList.add("dark");
+      document.documentElement.classList.add("dark");
     }
   </script>
   
@@ -13,6 +13,11 @@
   
   <!-- ========== STYLES ========== -->
   <style>
+    html.dark, html.dark body {
+      background-color: #1a1a1a;
+      color: #ffe8c2;
+    }
+
     /* ========== Base Page Styling ========== */
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -21,7 +26,7 @@
       padding: 2rem;
       text-align: center;
     }
-    body.dark {
+    html.dark {
       background-color: #1a1a1a;
       color: #ffe8c2;
     }
@@ -50,8 +55,8 @@
     .music-toggle:nth-of-type(2) { top: 50px; } /* dark mode toggle */
     .history-button { top: 10px; left: 20px; }
 
-    .dark .music-toggle,
-    .dark .history-button {
+    html.dark .music-toggle,
+    html.dark .history-button {
       background: #333;
       color: #ffe8c2;
       border-color: #a6764d;
@@ -79,7 +84,7 @@
     }
 
     .card:hover { transform: translateY(-5px); }
-    .dark .card { background: #2b2b2b; border-color: #a6764d; }
+    html.dark .card { background: #2b2b2b; border-color: #a6764d; }
 
     .box-badge {
       position: absolute;
@@ -93,10 +98,17 @@
       border-radius: 12px;
       box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
     }
-    .dark .box-badge { background-color: #8a5a2f; color: #fff6e6; }
+    html.dark .box-badge { background-color: #8a5a2f; color: #fff6e6; }
 
     .box-title { font-size: 1.6rem; font-weight: bold; color: #b45d36; margin-bottom: 0.4rem; }
     .box-price { font-weight: bold; color: #a85429; margin-bottom: 1rem; }
+
+    html.dark .box-title {
+      color: #ffcc99;
+    }
+    html.dark .box-price {
+      color: #ffb366;
+    }
 
     .item {
       background-color: #ffe6aa;
@@ -106,7 +118,7 @@
       font-size: 0.95rem;
       box-shadow: 1px 1px 3px rgba(0,0,0,0.05);
     }
-    .dark .item { background-color: #3a3a3a; color: #fff6e6; }
+    html.dark .item { background-color: #3a3a3a; color: #fff6e6; }
 
     /* ========== Quantity Controls ========== */
     .quantity-controls {
@@ -150,6 +162,8 @@
     #buyAllBtn:hover { background-color: #d86c56; }
     #summary { margin-top: 1rem; font-size: 1rem; color: #7a4224; }
 
+    html.dark #summary { color: #ffddb3;}
+
     /* ========== Popup Overlay ========== */
     #overlay {
       position: fixed;
@@ -173,7 +187,7 @@
       box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
       animation: pop 0.4s ease-out;
     }
-    .dark #popupBox { background: #2e2e2e; color: #ffd6a0; }
+    html.dark #popupBox { background: #2e2e2e; color: #ffd6a0; }
 
     #popupImage {
       width: 100px;
@@ -202,6 +216,10 @@
       margin-top: 2rem;
       font-size: 0.9rem;
       color: #c28050;
+    }
+
+    html.dark .footer {
+      color: #cba97e;
     }
   </style>
 </head>
@@ -244,7 +262,7 @@
     // Load and apply saved dark mode
     const savedDark = localStorage.getItem("darkMode") === "true";
     if (savedDark) {
-      document.body.classList.add("dark");
+      document.documentElement.classList.add("dark");
       const darkStatus = document.getElementById("darkModeStatus");
       if (darkStatus) darkStatus.innerText = "Dark";
     }
@@ -283,19 +301,20 @@
 
     // Apply dark mode on page load if saved
     if (localStorage.getItem("darkMode") === "true") {
-      document.body.classList.add("dark");
+      document.documentElement.classList.add("dark");
     }
 
     // === Dark Mode Setup ===
     const modeStatus = document.getElementById("darkModeStatus");
     if (modeStatus) {
-      modeStatus.innerText = document.body.classList.contains("dark") ? "Dark" : "Light";
+      const isDark = document.documentElement.classList.contains("dark");
+      modeStatus.innerText = isDark ? "Dark" : "Light";
     }
 
     // ========== Toggle Light/Dark Mode ==========
     function toggleDarkMode() {
-      document.body.classList.toggle("dark");
-      const isDark = document.body.classList.contains("dark");
+      document.documentElement.classList.toggle("dark");
+      const isDark = document.documentElement.classList.contains("dark");
       localStorage.setItem("darkMode", isDark);
       document.getElementById("darkModeStatus").innerText = isDark ? "Dark" : "Light";
     }
