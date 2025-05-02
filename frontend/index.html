@@ -254,7 +254,7 @@
   
   <script>
     // ========== Configuration and Audio Elements ==========
-    const BASE_URL = "http://172.20.10.7:8080";  // Backend server base URL
+    const BASE_URL = "http://172.20.10.2:8080";  // Backend server base URL
     const ding = document.getElementById("ding");            // Sound when an item appears
     const clickSound = document.getElementById("clickSound"); // Sound effect for clicks
     const revealSound = document.getElementById("revealSound"); // Sound when an item is revealed
@@ -398,9 +398,11 @@
         // Quantity selector controls
         const controls = document.createElement("div");
         controls.className = "quantity-controls";
+        const totalItemsRemaining = box.items.reduce((sum, item) => sum + item.itemAmount, 0);
+
         controls.innerHTML = `
           <button>−</button>
-          <input type="number" class="quantity-input" min="0" value="${boxQuantities[box.boxName]}" />
+          <input type="number" class="quantity-input" min="0" max="${totalItemsRemaining}" value="${boxQuantities[box.boxName]}" />
           <button>+</button>
         `;
 
@@ -416,11 +418,13 @@
 
         // Event: Increase quantity
         plusBtn.onclick = () => {
-          playClickSound();
+        playClickSound();
+        if (parseInt(qtyInput.value) < totalItemsRemaining) {
           qtyInput.value++;
           boxQuantities[box.boxName] = parseInt(qtyInput.value);
           updateSummary();
-        };
+        }
+      };
 
         // Event: Manual number input
         qtyInput.oninput = () => {
@@ -505,7 +509,15 @@
               popup.innerHTML = `
                 <div style="font-size: 1.6rem; font-weight: bold; color: #b45d36; margin-bottom: 0.4rem;">You Got:</div>
                 <div style="font-weight:bold; font-size:1rem; margin-bottom:0.4rem;">${boxName}</div>
-                <div>${itemList.map(name => `🎁 ${name}`).join("<br>")}</div>
+                <div>${
+                  Object.entries(
+                    itemList.reduce((acc, name) => {
+                      acc[name] = (acc[name] || 0) + 1;
+                      return acc;
+                    }, {})
+                  ).map(([name, count]) => `🎁 ${name} ×${count}`).join("<br>")
+                }</div>
+
                 <div style="margin-top: 1rem;">
                   <button id="prevBoxBtn">Prev</button>
                   <span style="margin: 0 1rem;">${index + 1} / ${boxNames.length}</span>
