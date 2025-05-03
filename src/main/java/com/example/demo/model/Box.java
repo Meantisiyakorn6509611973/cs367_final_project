@@ -21,12 +21,18 @@ public class Box {
     private int boxPrice;
 
     @OneToMany(mappedBy = "box", cascade = CascadeType.ALL)
-    @JsonManagedReference
+    // FUCK YOU FUCK YOU FUCK YOU FUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOUFUCK YOU @JsonManagedReference
     // List of items associated with this box
     private List<Item> items;
 
     // Default constructor
     public Box() {}
+
+    public Box(String boxName, int boxPrice, List<Item> items) {
+        this.boxName = boxName;
+        this.boxPrice = boxPrice;
+        this.items = items;
+    }
 
     // Getter and setter for boxName
     public String getBoxName() {
